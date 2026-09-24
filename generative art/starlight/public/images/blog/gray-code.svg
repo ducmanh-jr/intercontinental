@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 320" role="img" aria-label="格雷码环示意：相邻数只变一位">
+  <defs>
+    <linearGradient id="gcBg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#282c34"/>
+      <stop offset="1" stop-color="#21252b"/>
+    </linearGradient>
+    <marker id="gcArrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" fill="#98c379"/>
+    </marker>
+  </defs>
+  <rect width="640" height="320" rx="10" fill="url(#gcBg)"/>
+  <text x="24" y="34" font-family="monospace" font-size="15" fill="#abb2bf">i ^ (i &gt;&gt; 1)：每走一步，只翻一个二进制位</text>
+
+  <!-- 左栏：对照与公式（x: 24..200） -->
+  <g font-family="monospace" font-size="13">
+    <text x="24" y="96" fill="#5c6370">自然二进制计数：</text>
+    <text x="24" y="118" fill="#e06c75">011 → 100</text>
+    <text x="24" y="136" fill="#e06c75">（一次变 3 位）</text>
+    <text x="24" y="172" fill="#5c6370">格雷码计数：</text>
+    <text x="24" y="194" fill="#98c379">011 → 010</text>
+    <text x="24" y="212" fill="#98c379">（只变 1 位）</text>
+    <text x="24" y="252" fill="#abb2bf">g(5) = 101 ^ 010 = 111</text>
+    <text x="24" y="272" fill="#abb2bf">g(6) = 110 ^ 011 = 101</text>
+    <text x="24" y="302" fill="#c678dd">应用：旋转编码器、状态遍历</text>
+  </g>
+
+  <!-- 右：格雷码环（中心 440,170） -->
+  <g font-family="monospace" font-size="14" text-anchor="middle">
+    <circle cx="440" cy="76" r="21" fill="#61afef"/><text x="440" y="81" fill="#282c34">000</text>
+    <circle cx="524" cy="110" r="21" fill="#3a3f4b"/><text x="524" y="115" fill="#abb2bf">001</text>
+    <circle cx="552" cy="170" r="21" fill="#3a3f4b"/><text x="552" y="175" fill="#abb2bf">011</text>
+    <circle cx="524" cy="230" r="21" fill="#3a3f4b"/><text x="524" y="235" fill="#abb2bf">010</text>
+    <circle cx="356" cy="230" r="21" fill="#3a3f4b"/><text x="356" y="235" fill="#abb2bf">110</text>
+    <circle cx="328" cy="170" r="21" fill="#3a3f4b"/><text x="328" y="175" fill="#abb2bf">111</text>
+    <circle cx="356" cy="110" r="21" fill="#3a3f4b"/><text x="356" y="115" fill="#abb2bf">101</text>
+    <g stroke="#98c379" stroke-width="2" fill="none">
+      <path d="M464 84 L500 98" marker-end="url(#gcArrow)"/>
+      <path d="M540 128 L546 150" marker-end="url(#gcArrow)"/>
+      <path d="M546 192 L536 216" marker-end="url(#gcArrow)"/>
+      <path d="M502 246 Q440 270 378 246" marker-end="url(#gcArrow)"/>
+      <path d="M340 216 L332 192" marker-end="url(#gcArrow)"/>
+      <path d="M332 150 L340 128" marker-end="url(#gcArrow)"/>
+      <path d="M378 96 Q404 78 416 76" marker-end="url(#gcArrow)"/>
+    </g>
+    <g font-size="11" fill="#e5c07b">
+      <text x="486" y="80">↑翻0位</text>
+      <text x="572" y="140">翻1位</text>
+      <text x="572" y="216">翻0位</text>
+      <text x="440" y="292">翻2位</text>
+      <text x="296" y="216" text-anchor="end">翻0位</text>
+      <text x="296" y="140" text-anchor="end">翻1位</text>
+      <text x="392" y="66">翻0位</text>
+    </g>
+  </g>
+</svg>

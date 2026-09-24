@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <script>
+      (function () {
+        try {
+          var redirect = sessionStorage.redirect;
+          if (redirect && redirect !== location.href) {
+            delete sessionStorage.redirect;
+            history.replaceState(null, '', redirect);
+          }
+        } catch (e) {
+          /* storage 不可用时静默降级 */
+        }
+      })();
+    </script>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="个人网站：前端开发、算法与生活。" />
+    <meta name="theme-color" content="#0a0a12" />
+    <link rel="icon" type="image/png" href="%BASE_URL%favicon.png" />
+    <link rel="alternate" type="application/atom+xml" title="星港日志 RSS" href="%BASE_URL%atom.xml" />
+    <meta property="og:title" content="个人网站" />
+    <meta property="og:description" content="前端开发、算法与生活。" />
+    <title>个人网站</title>
+    <!--
+          ✦            ✦
+       ✦       ✦        ✦
+          ✦   ✦  ✦  ✦
+      ✦  STELLAR MAP v1.4  ✦
+        ✦      ✦     ✦
+      the stars remember every commit.
+    -->
+    <style>
+      html { background: #0a0a12; }
+      html[data-theme='sunset'] { background: #120c0a; }
+      html[data-theme='aurora'] { background: #071016; }
+      html[data-theme='paper'] { background: #f5f2ea; }
+      html[data-theme='sakura'] { background: #fbf4f7; }
+    </style>
+    <script>
+      // 主题首帧应用（v1.9）：在样式加载前把 data-theme 挂到 <html>，避免非默认主题闪色
+      (function () {
+        try {
+          var t = localStorage.getItem('starlight:theme');
+          if (t === 'sunset' || t === 'aurora' || t === 'paper' || t === 'sakura' || t === 'starport') {
+            document.documentElement.dataset.theme = t;
+          }
+        } catch (e) {
+          /* storage 不可用时用默认主题 */
+        }
+      })();
+    </script>
+  </head>
+  <body>
+    <!-- v2.15 可用性：键盘/读屏用户的首个 Tab 停留点，跳过导航直达正文 -->
+    <a class="skip-link" href="#main">跳到主内容</a>
+    <div id="app" style="min-height: 100vh"></div>
+    <script>
+      // 首帧高度占位（v1.7）：仅为消除 Vue mount「空→满」的文档高度跳变（CLS 伪影）。
+      // 首页优先使用上次访问记录的真实内容高度（sessionStorage，由 App.vue 挂载后写入），
+      // 无记录时退回保守估计；App.vue 挂载/切页后会把 min-height 校正为实际内容高度，
+      // 因此占位即使偏高也不会留下永久空白。其他页面 100vh，mount 后同样校正。
+      (function () {
+        var app = document.getElementById('app');
+        if (!app) return;
+        var seg = location.pathname.split('/');
+        var root = seg[1] ? '/' + seg[1] + '/' : '/';
+        if (location.pathname === root) {
+          var h = 0;
+          try {
+            h = parseFloat(sessionStorage.getItem('starlight:home-h')) || 0;
+          } catch (e) {
+            /* storage 不可用时静默降级 */
+          }
+          if (!h) h = window.innerWidth < 768 ? 3600 : 3120;
+          app.style.minHeight = h + 'px';
+        } else {
+          app.style.minHeight = '100vh';
+        }
+      })();
+    </script>
+    <div id="boot-hint" aria-hidden="true">
+      <div class="boot-spinner"></div>
+      <p>正在进入星港…</p>
+    </div>
+    <style>
+      #boot-hint {
+        position: fixed;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        background: #0a0a12;
+        color: #9ca3af;
+        font-size: 14px;
+        z-index: 9999;
+        transition: opacity 0.3s ease;
+      }
+      .boot-spinner {
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        border: 2px solid rgba(139, 92, 246, 0.3);
+        border-top-color: #22d3ee;
+        animation: boot-spin 0.9s linear infinite;
+      }
+      @keyframes boot-spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+      /* 各主题的启动遮罩底色与 spinner 主色（v1.9 起；v2.16 spinner 按主题分色，落日不再闪青色） */
+      html[data-theme='sunset'] #boot-hint { background: #120c0a; }
+      html[data-theme='sunset'] .boot-spinner { border-color: rgba(245, 158, 11, 0.3); border-top-color: #f59e0b; }
+      html[data-theme='aurora'] #boot-hint { background: #071016; }
+      html[data-theme='aurora'] .boot-spinner { border-color: rgba(45, 212, 191, 0.3); border-top-color: #2dd4bf; }
+      html[data-theme='paper'] #boot-hint { background: #f5f2ea; }
+      html[data-theme='paper'] #boot-hint p { color: #78716c; }
+      html[data-theme='paper'] .boot-spinner { border-color: rgba(15, 118, 110, 0.3); border-top-color: #0f766e; }
+      html[data-theme='sakura'] #boot-hint { background: #fbf4f7; }
+      html[data-theme='sakura'] #boot-hint p { color: #9a7f8c; }
+      html[data-theme='sakura'] .boot-spinner { border-color: rgba(190, 24, 93, 0.3); border-top-color: #be185d; }
+      @media (prefers-reduced-motion: reduce) {
+        .boot-spinner {
+          animation: none;
+        }
+      }
+      /* skip 链接：平时视觉隐藏，Tab 聚焦时浮现（v2.15） */
+      .skip-link {
+        position: fixed;
+        top: -48px;
+        left: 12px;
+        z-index: 10000;
+        padding: 10px 16px;
+        border-radius: 0 0 10px 10px;
+        background: #12121e;
+        border: 1px solid rgba(34, 211, 238, 0.5);
+        color: #22d3ee;
+        font-size: 13px;
+        text-decoration: none;
+        transition: top 0.15s ease;
+      }
+      .skip-link:focus {
+        top: 0;
+      }
+    </style>
+    <!--
+      footer 静态化（v1.5）：首帧即存在于 DOM，避免 Vue mount「空→满」插入的 CLS 伪影。
+      站内链接带 data-spa，由 App.vue 的 click 委托接管为无刷新路由跳转。
+      维护：社交链接/版本号变更时，同步更新 src/data/profile.ts 与 VersionArchiveView.vue。
+    -->
+    <footer class="relative z-10 border-t border-white/10">
+      <div class="mx-auto max-w-5xl px-6 py-12">
+        <div class="grid gap-10 md:grid-cols-[1fr_auto]">
+          <div>
+            <p class="glow-text font-mono text-lg font-bold">STARLIGHT</p>
+            <p class="mt-2 text-sm text-text-muted">✦ the stars remember every commit · 记录代码与思考</p>
+          </div>
+          <div class="flex gap-12 text-sm">
+            <ul class="space-y-2">
+              <li class="font-mono text-xs uppercase tracking-[0.25em] text-text-muted/70">导航</li>
+              <li><a data-spa href="%BASE_URL%" class="text-text-muted hover:text-text">首页</a></li>
+              <li><a data-spa href="%BASE_URL%projects" class="text-text-muted hover:text-text">项目</a></li>
+              <li><a data-spa href="%BASE_URL%blog" class="text-text-muted hover:text-text">博客</a></li>
+              <li><a data-spa href="%BASE_URL%now" class="text-text-muted hover:text-text">日志</a></li>
+            </ul>
+            <ul class="space-y-2">
+              <li class="font-mono text-xs uppercase tracking-[0.25em] text-text-muted/70">星港</li>
+              <li><a data-spa href="%BASE_URL%about" class="text-text-muted hover:text-text">关于</a></li>
+              <li><a data-spa href="%BASE_URL%friends" class="text-text-muted hover:text-text">友邻</a></li>
+              <li><a data-spa href="%BASE_URL%guestbook" class="text-text-muted hover:text-text">留言板</a></li>
+              <li><a href="https://github.com/xrk-hhh" target="_blank" rel="noopener" class="text-text-muted hover:text-text">GitHub</a></li>
+              <li><a href="mailto:xxjh2487657826@outlook.com" class="text-text-muted hover:text-text">邮箱</a></li>
+            </ul>
+          </div>
+        </div>
+        <div class="mt-10 flex items-center justify-between border-t border-white/10 pt-6 text-xs text-text-muted">
+          <p>
+            © <span id="footer-year">2026</span> xrk-hhh · 按 ? 查看快捷键
+            <span id="visit-greet" class="ml-1"></span>
+          </p>
+          <a data-spa href="%BASE_URL%versions" class="font-mono text-text-muted/70 hover:text-primary">v2.19.0</a>
+        </div>
+      </div>
+    </footer>
+    <script>
+      document.getElementById('footer-year').textContent = String(new Date().getFullYear());
+      // v2.15 人格化问候：localStorage 记到访次数（仅本机，不上报任何数据）
+      (function () {
+        try {
+          var n = parseInt(localStorage.getItem('starlight:visits') || '0', 10) + 1;
+          localStorage.setItem('starlight:visits', String(n));
+          var el = document.getElementById('visit-greet');
+          if (el)
+            el.textContent =
+              n === 1 ? '· ✦ 欢迎首次到访星港' : n < 10 ? '· ✦ 你已第 ' + n + ' 次回到星港' : '· ✦ 星港的老朋友，第 ' + n + ' 次巡航';
+        } catch (e) {
+          /* storage 不可用时静默 */
+        }
+      })();
+    </script>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

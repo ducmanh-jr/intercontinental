@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 300" role="img" aria-label="堆优化 Dijkstra 扩散示意">
+  <defs>
+    <linearGradient id="dhBg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#282c34"/>
+      <stop offset="1" stop-color="#21252b"/>
+    </linearGradient>
+    <radialGradient id="dhGlow" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#61afef" stop-opacity="0.35"/>
+      <stop offset="1" stop-color="#61afef" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="640" height="300" rx="10" fill="url(#dhBg)"/>
+  <text x="24" y="34" font-family="monospace" font-size="15" fill="#abb2bf">贪心扩散：每次从堆里取「当前最近的未定点」</text>
+
+  <!-- 图结构 -->
+  <g stroke="#3a3f4b" stroke-width="2">
+    <line x1="140" y1="120" x2="240" y2="90"/>
+    <line x1="140" y1="120" x2="240" y2="180"/>
+    <line x1="240" y1="90" x2="360" y2="120"/>
+    <line x1="240" y1="180" x2="360" y2="120"/>
+    <line x1="240" y1="90" x2="240" y2="180"/>
+  </g>
+  <g font-family="monospace" font-size="12" fill="#5c6370">
+    <text x="176" y="92">4</text>
+    <text x="176" y="160">1</text>
+    <text x="300" y="88">1</text>
+    <text x="302" y="174">5</text>
+    <text x="248" y="140">2</text>
+  </g>
+
+  <!-- 顶点 -->
+  <g font-family="monospace" font-size="14" text-anchor="middle">
+    <circle cx="140" cy="120" r="20" fill="#61afef"/><text x="140" y="126" fill="#282c34">S</text>
+    <circle cx="240" cy="90" r="20" fill="#98c379"/><text x="240" y="96" fill="#282c34">A</text>
+    <circle cx="240" cy="180" r="20" fill="#98c379"/><text x="240" y="186" fill="#282c34">B</text>
+    <circle cx="360" cy="120" r="20" fill="#3a3f4b"/><text x="360" y="126" fill="#abb2bf">T</text>
+  </g>
+  <!-- 距离标签 -->
+  <g font-family="monospace" font-size="12" fill="#e5c07b">
+    <text x="240" y="62" text-anchor="middle">dist=4 ✓</text>
+    <text x="240" y="216" text-anchor="middle">dist=1 ✓</text>
+    <text x="360" y="86" text-anchor="middle">dist=6 待定</text>
+  </g>
+
+  <!-- 堆示意 -->
+  <g font-family="monospace" font-size="13">
+    <rect x="440" y="70" width="180" height="120" rx="8" fill="#21252b" stroke="#3a3f4b"/>
+    <text x="456" y="96" fill="#c678dd">优先队列（小根堆）</text>
+    <text x="456" y="120" fill="#98c379">(1, B) ← 先出堆</text>
+    <text x="456" y="142" fill="#abb2bf">(4, A)</text>
+    <text x="456" y="164" fill="#5c6370">(6, T) 旧冗余条目</text>
+  </g>
+
+  <!-- 底部要点 -->
+  <g font-family="monospace" font-size="13">
+    <text x="60" y="248" fill="#abb2bf">惰性删除：dist 更新时不删旧堆项，出堆时</text>
+    <text x="60" y="270" fill="#e5c07b">if (d != dist[u]) continue; 直接跳过过期条目</text>
+  </g>
+</svg>

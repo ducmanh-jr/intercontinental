@@ -1,0 +1,516 @@
+@import "tailwindcss";
+
+@theme {
+  --color-bg: #0a0a12;
+  --color-surface: #12121e;
+  --color-primary: #22d3ee;
+  --color-accent: #8b5cf6;
+  --color-text: #f4f4f5;
+  --color-text-muted: #9ca3af;
+  --font-sans: "PingFang SC", "Microsoft YaHei", "Noto Sans CJK SC", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", Consolas, monospace;
+}
+
+@layer base {
+  html {
+    /* 纯色兜底 */
+    background: var(--color-bg);
+  }
+  /* 全元素禁用 scroll anchoring：内容变化时不再补偿滚动位置。
+     本站内容在滚动中不插入/不增删，禁 anchor 无副作用，
+     并消除 Chrome 滚动模拟（Lighthouse gesture 滚动）下的 CLS 伪影。 */
+  * {
+    overflow-anchor: none;
+  }
+  body {
+    @apply text-text font-sans antialiased;
+    /* 静态环境光渐变：WebGL 不可用时的回退背景（§5.3），粒子层正常时被 canvas 覆盖。
+       用主题变量 mix 出光晕颜色，随 data-theme 换肤 */
+    background:
+      radial-gradient(ellipse at 30% 20%, color-mix(in oklab, var(--color-primary) 8%, transparent), transparent 60%),
+      radial-gradient(ellipse at 70% 80%, color-mix(in oklab, var(--color-accent) 8%, transparent), transparent 60%),
+      var(--color-bg);
+  }
+  ::selection {
+    background: color-mix(in oklab, var(--color-primary) 30%, transparent);
+  }
+  /* 键盘导航可见性：青紫描边焦点环（v1.5 设计增强） */
+  :focus-visible {
+    outline: 2px solid color-mix(in oklab, var(--color-primary) 70%, transparent);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+  /* 深色滚动条（WebKit/Chromium；Firefox 用 scrollbar-color） */
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: var(--color-bg);
+  }
+  ::-webkit-scrollbar-thumb {
+    background: color-mix(in oklab, var(--color-primary) 25%, #1e1e2e);
+    border-radius: 5px;
+    border: 2px solid var(--color-bg);
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: color-mix(in oklab, var(--color-primary) 45%, #1e1e2e);
+  }
+  * {
+    scrollbar-color: color-mix(in oklab, var(--color-primary) 25%, #1e1e2e) var(--color-bg);
+    scrollbar-width: thin;
+  }
+}
+
+@layer components {
+  .section-container {
+    @apply mx-auto w-full max-w-5xl px-6 py-20;
+  }
+  .card {
+    @apply rounded-xl border border-white/10 bg-surface/70 backdrop-blur-sm;
+    transition:
+      border-color 0.25s ease,
+      box-shadow 0.25s ease;
+  }
+  .card:hover {
+    border-color: color-mix(in oklab, var(--color-primary) 30%, transparent);
+    box-shadow:
+      0 0 0 1px color-mix(in oklab, var(--color-primary) 12%, transparent),
+      0 12px 40px -12px color-mix(in oklab, var(--color-primary) 18%, transparent),
+      0 4px 24px -8px color-mix(in oklab, var(--color-accent) 14%, transparent);
+  }
+  .glow-text {
+    background: linear-gradient(90deg, var(--color-primary), var(--color-accent));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  /* 星辰分隔线：标题/段落之间的装饰性分隔（v1.7） */
+  .star-divider {
+    @apply mx-auto flex w-full max-w-xs items-center gap-3;
+  }
+  .star-divider::before,
+  .star-divider::after {
+    content: '';
+    @apply h-px flex-1;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15));
+  }
+  .star-divider::after {
+    background: linear-gradient(90deg, rgba(255, 255, 255, 0.15), transparent);
+  }
+  .star-divider > span {
+    @apply text-xs text-primary/60;
+  }
+  /* 星星闪烁：贡献星图/友邻轨道的高亮点缀（reduced-motion 全局关闭） */
+  .twinkle {
+    animation: twinkle 3s ease-in-out infinite;
+  }
+  @keyframes twinkle {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.45;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .twinkle {
+      animation: none;
+    }
+  }
+  .btn-primary {
+    @apply inline-flex items-center gap-2 rounded-lg px-6 py-3 text-sm font-medium text-white
+      transition-all duration-200;
+    background: linear-gradient(90deg, var(--color-primary), var(--color-accent));
+    box-shadow: 0 4px 20px -6px color-mix(in oklab, var(--color-primary) 40%, transparent);
+  }
+  .btn-primary:hover {
+    opacity: 0.92;
+    box-shadow:
+      0 6px 28px -6px color-mix(in oklab, var(--color-primary) 55%, transparent),
+      0 0 0 1px color-mix(in oklab, var(--color-primary) 20%, transparent);
+    transform: translateY(-1px);
+  }
+  .btn-primary:active {
+    transform: translateY(0);
+  }
+
+  /* 博客正文排版（Task 16） */
+  .blog-content h1, .blog-content h2, .blog-content h3 { @apply mt-8 mb-4 font-semibold text-text; }
+  .blog-content h2 { @apply mt-12; }
+  .blog-content p { @apply my-4 leading-relaxed text-text-muted; }
+  .blog-content ul { @apply my-4 list-disc pl-6 text-text-muted; }
+  .blog-content ol { @apply my-4 list-decimal pl-6 text-text-muted; }
+  .blog-content pre { @apply my-4 overflow-x-auto rounded-lg border border-white/10 p-4 text-sm; position: relative; padding-top: 1.9rem; }
+  /* 代码块增强（v2.3）：复制按钮与语言角标由 BlogPostView 注入 */
+  .blog-content pre .copy-btn {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.625rem;
+    padding: 0.125rem 0.5rem;
+    font-family: var(--font-mono, monospace);
+    font-size: 11px;
+    line-height: 1.5;
+    color: var(--color-text-muted);
+    background: color-mix(in oklab, var(--color-surface) 85%, transparent);
+    border: 1px solid color-mix(in oklab, var(--color-primary) 25%, transparent);
+    border-radius: 0.375rem;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.2s, color 0.2s, border-color 0.2s;
+  }
+  .blog-content pre:hover .copy-btn,
+  .blog-content pre .copy-btn:focus-visible { opacity: 1; }
+  .blog-content pre .copy-btn:hover {
+    color: var(--color-primary);
+    border-color: color-mix(in oklab, var(--color-primary) 60%, transparent);
+  }
+  .blog-content pre .code-lang {
+    position: absolute;
+    top: 0.5rem;
+    left: 0.75rem;
+    font-family: var(--font-mono, monospace);
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: color-mix(in oklab, var(--color-primary) 55%, var(--color-text-muted));
+    pointer-events: none;
+  }
+  .blog-content code { @apply font-mono; }
+  .blog-content :not(pre) > code {
+    @apply rounded border border-white/10 bg-surface px-1.5 py-0.5 text-[0.85em] text-primary;
+  }
+  .blog-content blockquote {
+    @apply my-6 border-l-2 border-primary/50 bg-surface/50 py-2 pl-4 pr-4 text-text-muted italic;
+    border-radius: 0 0.5rem 0.5rem 0;
+  }
+  .blog-content img {
+    @apply my-6 rounded-lg border border-white/10;
+    /* SVG 无固有宽度时按容器收缩，防横向溢出裁切 */
+    max-width: 100%;
+    height: auto;
+  }
+  .blog-content hr {
+    @apply my-10 border-white/10;
+  }
+  .blog-content a { @apply text-primary hover:underline; }
+  /* 表格美化（v2.9 重设计）：fit-content 水平居中 + 主题自适应边框（mix 文字色，
+     五套主题免逐个适配）+ 圆角外框 + 表头主色晕染 + 斑马纹与行悬停 */
+  .blog-content table {
+    margin: 1.75rem auto;
+    width: fit-content;
+    min-width: 58%;
+    max-width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-size: 0.86rem;
+    line-height: 1.55;
+    border: 1px solid color-mix(in oklab, var(--color-text) 13%, transparent);
+    border-radius: 0.65rem;
+    overflow: hidden;
+  }
+  .blog-content th, .blog-content td {
+    @apply px-4 py-2.5 text-left;
+    border-bottom: 1px solid color-mix(in oklab, var(--color-text) 9%, transparent);
+  }
+  .blog-content th:not(:last-child), .blog-content td:not(:last-child) {
+    border-right: 1px solid color-mix(in oklab, var(--color-text) 8%, transparent);
+  }
+  .blog-content thead th {
+    @apply font-mono text-[11px] uppercase tracking-[0.15em];
+    color: color-mix(in oklab, var(--color-primary) 80%, var(--color-text));
+    background: color-mix(in oklab, var(--color-primary) 10%, var(--color-surface));
+    white-space: nowrap;
+  }
+  .blog-content tbody tr:nth-child(even) td {
+    background: color-mix(in oklab, var(--color-primary) 4%, transparent);
+  }
+  .blog-content tbody tr:hover td {
+    background: color-mix(in oklab, var(--color-primary) 9%, transparent);
+  }
+  .blog-content tr:last-child td { border-bottom: none; }
+  .blog-content tbody td:first-child { color: var(--color-text); }
+}
+
+/* ===== 多主题（v1.9）：CSS 变量级换肤，5 套配色 =====
+   深空星港（默认）为 Tailwind @theme 基线；其余主题在 html[data-theme] 上覆盖同名变量。
+   未分层规则优先级高于 Tailwind 分层输出，直接生效于所有 var() 消费方。 */
+html[data-theme='sunset'] {
+  --color-bg: #120c0a;
+  --color-surface: #1f1411;
+  --color-primary: #f59e0b;
+  --color-accent: #f43f5e;
+  --color-text: #faf5ef;
+  --color-text-muted: #b3a79b;
+}
+html[data-theme='aurora'] {
+  --color-bg: #071016;
+  --color-surface: #0e1e26;
+  --color-primary: #2dd4bf;
+  --color-accent: #60a5fa;
+  --color-text: #ecfeff;
+  --color-text-muted: #8fb3bd;
+}
+html[data-theme='paper'] {
+  --color-bg: #f5f2ea;
+  --color-surface: #ffffff;
+  --color-primary: #0f766e;
+  --color-accent: #7c3aed;
+  --color-text: #292524;
+  --color-text-muted: #78716c;
+}
+html[data-theme='sakura'] {
+  --color-bg: #fbf4f7;
+  --color-surface: #ffffff;
+  --color-primary: #be185d;
+  --color-accent: #6d28d9;
+  --color-text: #402532;
+  --color-text-muted: #9a7f8c;
+}
+
+/* ===== 主题场景化（v2.11）：每主题独立氛围层，不止换色 =====
+   1) body 多层渐变各自成「世界」（星海 / 晚霞 / 冰原 / 纸面 / 樱暮）
+   2) 动效层用 body::before（fixed、pointer-events:none、置于内容之下星空之上）
+   3) 粒子/星云/流星颜色由 useTheme.scene 驱动（ParticleScene.setTheme）
+   动画均在 prefers-reduced-motion 下关闭。 */
+
+/* —— 落日熔金：地平线日轮 + 上下暖霞 —— */
+html[data-theme='sunset'] body {
+  background:
+    radial-gradient(ellipse 90% 42% at 50% 112%, rgba(251, 191, 36, 0.24), transparent 62%),
+    radial-gradient(ellipse 120% 46% at 50% 118%, rgba(244, 63, 94, 0.16), transparent 60%),
+    radial-gradient(ellipse 60% 30% at 18% -8%, rgba(124, 45, 18, 0.32), transparent 70%),
+    linear-gradient(180deg, #171017 0%, #120c0a 48%, #170d0b 100%),
+    var(--color-bg);
+}
+html[data-theme='sunset'] body::before {
+  content: '';
+  position: fixed;
+  left: 50%;
+  bottom: -20vh;
+  width: 62vmin;
+  height: 62vmin;
+  transform: translateX(-50%);
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(253, 230, 138, 0.30), rgba(245, 158, 11, 0.12) 45%, transparent 70%);
+  filter: blur(10px);
+  animation: sunset-breathe 10s ease-in-out infinite;
+  pointer-events: none;
+}
+@keyframes sunset-breathe {
+  0%, 100% { opacity: 0.72; }
+  50% { opacity: 1; }
+}
+/* v2.16 落日专属适配：
+   1) 代码块暖化——One Dark 的冷蓝底（#282c34）在暖棕页面里穿帮，换成等亮度暖棕
+      （token 色板按 #282c34 亮度设计，#2a211b 亮度差 <2%，可读性不受影响）
+   2) 卡片发丝边带一丝琥珀，暖色页面更整体 */
+html[data-theme='sunset'] .blog-content pre {
+  background-color: #2a211b !important;
+  border-color: rgba(245, 158, 11, 0.16);
+}
+html[data-theme='sunset'] .card {
+  border-color: rgba(245, 158, 11, 0.14);
+}
+
+/* —— 极光冰川：顶部极光帘幕（双向缓漂 + 呼吸缩放）+ 底部冰面反光 —— */
+html[data-theme='aurora'] body {
+  background:
+    radial-gradient(ellipse 80% 26% at 50% 118%, rgba(125, 211, 252, 0.10), transparent 65%),
+    linear-gradient(180deg, #050d14 0%, #071016 55%, #08131b 100%),
+    var(--color-bg);
+}
+html[data-theme='aurora'] body::before {
+  content: '';
+  position: fixed;
+  top: -12vh;
+  left: -10vw;
+  right: -10vw;
+  height: 56vh;
+  background:
+    linear-gradient(97deg, transparent 4%, rgba(45, 212, 191, 0.16) 22%, rgba(96, 165, 250, 0.13) 40%, rgba(167, 243, 208, 0.10) 52%, transparent 66%),
+    linear-gradient(113deg, transparent 34%, rgba(45, 212, 191, 0.11) 56%, rgba(125, 211, 252, 0.09) 70%, transparent 84%);
+  filter: blur(22px);
+  animation: aurora-drift 18s ease-in-out infinite alternate;
+  pointer-events: none;
+}
+@keyframes aurora-drift {
+  from { transform: skewY(-4deg) translateX(-3vw) scaleY(1); }
+  to { transform: skewY(-6deg) translateX(3vw) scaleY(1.12); }
+}
+
+/* —— 月白纸笺：暖纸纵向渐变 + 衬线字体 + 锐利卡片（信纸气质） —— */
+html[data-theme='paper'] body {
+  background:
+    radial-gradient(ellipse 70% 32% at 50% -12%, rgba(15, 118, 110, 0.06), transparent 60%),
+    linear-gradient(180deg, #f8f5ee 0%, #f5f2ea 55%, #ece5d6 100%);
+}
+html[data-theme='paper'] {
+  --font-sans: Georgia, 'Nimbus Roman', 'Songti SC', 'SimSun', serif;
+}
+html[data-theme='paper'] .card {
+  border-radius: 0.375rem;
+}
+
+/* —— 樱庭薄暮：樱粉暮色渐晕 + 更圆润的卡片；花瓣层见 .theme-petals —— */
+html[data-theme='sakura'] body {
+  background:
+    radial-gradient(ellipse 90% 40% at 82% -14%, rgba(244, 114, 182, 0.15), transparent 62%),
+    radial-gradient(ellipse 70% 34% at 12% 112%, rgba(167, 139, 250, 0.11), transparent 64%),
+    linear-gradient(180deg, #fdf6f9 0%, #fbf4f7 50%, #f6ebf2 100%);
+}
+html[data-theme='sakura'] .card {
+  border-radius: 1.25rem;
+}
+
+/* —— 樱花瓣飘落层（App.vue 挂载，仅樱庭薄暮显示；transform 动画走合成器） —— */
+.theme-petals {
+  position: fixed;
+  inset: 0;
+  z-index: 5; /* 星空之上、内容(z-10)之下 */
+  display: none;
+  pointer-events: none;
+  overflow: hidden;
+}
+html[data-theme='sakura'] .theme-petals {
+  display: block;
+}
+.theme-petals span {
+  position: absolute;
+  top: -4vh;
+  width: 10px;
+  height: 10px;
+  background: linear-gradient(135deg, rgba(244, 114, 182, 0.55), rgba(249, 168, 212, 0.45));
+  border-radius: 50% 0 50% 50%;
+  animation: petal-fall linear infinite;
+}
+.theme-petals span:nth-child(1) { left: 6%;  animation-duration: 16s; animation-delay: -2s; }
+.theme-petals span:nth-child(2) { left: 18%; animation-duration: 21s; animation-delay: -9s; transform: scale(0.8); }
+.theme-petals span:nth-child(3) { left: 31%; animation-duration: 14s; animation-delay: -5s; transform: scale(1.2); }
+.theme-petals span:nth-child(4) { left: 44%; animation-duration: 24s; animation-delay: -13s; }
+.theme-petals span:nth-child(5) { left: 56%; animation-duration: 17s; animation-delay: -7s; transform: scale(0.7); }
+.theme-petals span:nth-child(6) { left: 66%; animation-duration: 20s; animation-delay: -16s; transform: scale(1.1); }
+.theme-petals span:nth-child(7) { left: 76%; animation-duration: 15s; animation-delay: -4s; }
+.theme-petals span:nth-child(8) { left: 85%; animation-duration: 22s; animation-delay: -11s; transform: scale(0.9); }
+.theme-petals span:nth-child(9) { left: 93%; animation-duration: 18s; animation-delay: -1s; transform: scale(1.15); }
+.theme-petals span:nth-child(10) { left: 12%; animation-duration: 26s; animation-delay: -20s; transform: scale(0.6); }
+@keyframes petal-fall {
+  0% { translate: 0 -4vh; rotate: 0deg; opacity: 0; }
+  8% { opacity: 0.8; }
+  88% { opacity: 0.8; }
+  100% { translate: 6vw 108vh; rotate: 540deg; opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html[data-theme='sunset'] body::before,
+  html[data-theme='aurora'] body::before,
+  .theme-petals span {
+    animation: none;
+  }
+  .theme-petals {
+    display: none;
+  }
+}
+
+/* —— 主题可变光晕工具（替代模板里硬编码的 rgba 光晕，随主题变量换色） —— */
+.glow-orbit-primary {
+  box-shadow: 0 0 16px color-mix(in oklab, var(--color-primary) 25%, transparent);
+}
+.glow-orbit-accent {
+  box-shadow: 0 0 16px color-mix(in oklab, var(--color-accent) 25%, transparent);
+}
+.glow-toast-accent {
+  box-shadow: 0 0 20px color-mix(in oklab, var(--color-accent) 30%, transparent);
+}
+.glow-dot-primary {
+  box-shadow: 0 0 6px color-mix(in oklab, var(--color-primary) 90%, transparent);
+}
+.glow-bar-accent {
+  box-shadow: 0 0 8px color-mix(in oklab, var(--color-accent) 60%, transparent);
+}
+.hover-glow-primary:hover {
+  box-shadow: 0 0 16px color-mix(in oklab, var(--color-primary) 45%, transparent);
+}
+.glow-cursor {
+  filter: drop-shadow(0 0 6px color-mix(in oklab, var(--color-primary) 55%, transparent));
+}
+
+/* 浅色主题兼容层：
+   1) 白色系边框/分隔在白底不可见 → 换成文字色 mix；
+   2) 星尘粒子在浅底压暗 → canvas 降透明度 0.35；
+   3) 白色微高亮 hover 在浅底无效 → 换成主色极淡 mix */
+html[data-theme='paper'],
+html[data-theme='sakura'] {
+  color-scheme: light;
+}
+html[data-theme='paper'] .border-white\/10,
+html[data-theme='sakura'] .border-white\/10,
+html[data-theme='paper'] .border-white\/15,
+html[data-theme='sakura'] .border-white\/15,
+html[data-theme='paper'] .border-white\/20,
+html[data-theme='sakura'] .border-white\/20 {
+  border-color: color-mix(in oklab, var(--color-text) 14%, transparent);
+}
+/* v2.15 双主题代码高亮：浅色主题把代码块切到 GitHub Light（shiki 输出的
+   --shiki-light 变量组；inline style 为深色值故需 !important 覆盖） */
+html[data-theme='paper'] .blog-content pre,
+html[data-theme='sakura'] .blog-content pre {
+  background-color: var(--shiki-light-bg, #fff) !important;
+  border-color: color-mix(in oklab, var(--color-text) 12%, transparent);
+}
+html[data-theme='paper'] .blog-content pre span,
+html[data-theme='sakura'] .blog-content pre span {
+  color: var(--shiki-light, inherit) !important;
+}
+/* v2.11 认证行为：星尘粒子在浅底压暗至 0.35（预乘合成下加色粒子呈柔和彩点） */
+html[data-theme='paper'] canvas[aria-hidden='true'],
+html[data-theme='sakura'] canvas[aria-hidden='true'] {
+  opacity: 0.35;
+}
+html[data-theme='paper'] .hover\:bg-white\/\[0\.03\]:hover,
+html[data-theme='sakura'] .hover\:bg-white\/\[0\.03\]:hover {
+  background-color: color-mix(in oklab, var(--color-primary) 5%, transparent);
+}
+/* v2.9 浅色主题批量适配（按全站 white 系工具类统计）：
+   细边框 / 分隔线 / 微底色 / 空星灰字 / hover 边框 */
+html[data-theme='paper'] .border-white\/5,
+html[data-theme='sakura'] .border-white\/5,
+html[data-theme='paper'] .divide-white\/5 > :not([hidden]) ~ :not([hidden]),
+html[data-theme='sakura'] .divide-white\/5 > :not([hidden]) ~ :not([hidden]) {
+  border-color: color-mix(in oklab, var(--color-text) 10%, transparent);
+}
+html[data-theme='paper'] .bg-white\/5,
+html[data-theme='sakura'] .bg-white\/5,
+html[data-theme='paper'] .bg-white\/\[0\.02\],
+html[data-theme='sakura'] .bg-white\/\[0\.02\] {
+  background-color: color-mix(in oklab, var(--color-text) 4%, transparent);
+}
+html[data-theme='paper'] .bg-white\/\[0\.03\],
+html[data-theme='sakura'] .bg-white\/\[0\.03\] {
+  background-color: color-mix(in oklab, var(--color-text) 5%, transparent);
+}
+html[data-theme='paper'] .text-white\/15,
+html[data-theme='sakura'] .text-white\/15,
+html[data-theme='paper'] .text-white\/20,
+html[data-theme='sakura'] .text-white\/20 {
+  color: color-mix(in oklab, var(--color-text) 22%, transparent);
+}
+html[data-theme='paper'] .hover\:border-white\/20:hover,
+html[data-theme='sakura'] .hover\:border-white\/20:hover,
+html[data-theme='paper'] .hover\:border-white\/30:hover,
+html[data-theme='sakura'] .hover\:border-white\/30:hover {
+  border-color: color-mix(in oklab, var(--color-text) 30%, transparent);
+}
+html[data-theme='paper'] .hover\:bg-white\/5:hover,
+html[data-theme='sakura'] .hover\:bg-white\/5:hover {
+  background-color: color-mix(in oklab, var(--color-text) 6%, transparent);
+}
+/* 星辰分隔线的白色渐变线在浅底不可见 → 文字色 mix */
+html[data-theme='paper'] .star-divider::before,
+html[data-theme='sakura'] .star-divider::before {
+  background: linear-gradient(90deg, transparent, color-mix(in oklab, var(--color-text) 18%, transparent));
+}
+html[data-theme='paper'] .star-divider::after,
+html[data-theme='sakura'] .star-divider::after {
+  background: linear-gradient(90deg, color-mix(in oklab, var(--color-text) 18%, transparent), transparent);
+}

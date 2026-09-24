@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 300" role="img" aria-label="XOR 消元成阶梯示意">
+  <defs>
+    <linearGradient id="xgBg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#282c34"/>
+      <stop offset="1" stop-color="#21252b"/>
+    </linearGradient>
+  </defs>
+  <rect width="640" height="300" rx="10" fill="url(#xgBg)"/>
+  <text x="24" y="34" font-family="monospace" font-size="15" fill="#abb2bf">把每个数看成一个 01 向量，从高位往低位"消"</text>
+  <!-- 三行消元阶梯 -->
+  <g font-family="monospace" font-size="15" text-anchor="middle">
+    <!-- 行1 有主元 -->
+    <text x="182" y="86" fill="#5c6370" text-anchor="end">basis[2] =</text>
+    <g>
+      <rect x="190" y="66" width="26" height="26" rx="4" fill="#61afef"/><text x="203" y="85" fill="#282c34">1</text>
+      <rect x="222" y="66" width="26" height="26" rx="4" fill="#3a3f4b"/><text x="235" y="85" fill="#abb2bf">1</text>
+      <rect x="254" y="66" width="26" height="26" rx="4" fill="#3a3f4b"/><text x="267" y="85" fill="#abb2bf">0</text>
+    </g>
+    <text x="320" y="86" fill="#5c6370" text-anchor="start">← 最高位是 2，占下主元位</text>
+    <!-- 行2 消掉再插入 -->
+    <text x="182" y="136" fill="#5c6370" text-anchor="end">x =</text>
+    <g>
+      <rect x="190" y="116" width="26" height="26" rx="4" fill="#61afef" opacity="0.35"/><text x="203" y="135" fill="#282c34">1</text>
+      <rect x="222" y="116" width="26" height="26" rx="4" fill="#e5c07b"/><text x="235" y="135" fill="#282c34">0</text>
+      <rect x="254" y="116" width="26" height="26" rx="4" fill="#3a3f4b"/><text x="267" y="135" fill="#abb2bf">1</text>
+    </g>
+    <text x="320" y="136" fill="#5c6370" text-anchor="start">高位已有主元 → x ^= basis[2]</text>
+    <!-- 行3 结果 -->
+    <text x="182" y="186" fill="#5c6370" text-anchor="end">x ^ b[2] =</text>
+    <g>
+      <rect x="190" y="166" width="26" height="26" rx="4" fill="#3a3f4b"/><text x="203" y="185" fill="#abb2bf">0</text>
+      <rect x="222" y="166" width="26" height="26" rx="4" fill="#e5c07b" opacity="0.35"/><text x="235" y="185" fill="#abb2bf">0</text>
+      <rect x="254" y="166" width="26" height="26" rx="4" fill="#98c379"/><text x="267" y="185" fill="#282c34">1</text>
+    </g>
+    <text x="320" y="186" fill="#98c379" text-anchor="start">→ 最高位空出，插入 basis[0]</text>
+  </g>
+  <!-- 底部结论 -->
+  <g font-family="monospace" font-size="13">
+    <text x="60" y="238" fill="#abb2bf">性质：每个主元位只属于一个基，任何子集 XOR 都能被这组基唯一表示</text>
+    <text x="60" y="262" fill="#c678dd">判断 x 可否被拼出：沿主元一路消，消到 0 就是能</text>
+    <text x="60" y="288" fill="#5c6370">时间复杂度：插入 O(log max)，n 个数 O(n log max)</text>
+  </g>
+</svg>

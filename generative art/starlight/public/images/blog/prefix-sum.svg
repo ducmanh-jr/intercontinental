@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 300" role="img" aria-label="前缀和示意图">
+  <defs>
+    <linearGradient id="psBg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#282c34"/>
+      <stop offset="1" stop-color="#21252b"/>
+    </linearGradient>
+  </defs>
+  <rect width="640" height="300" rx="10" fill="url(#psBg)"/>
+  <text x="24" y="36" font-family="monospace" font-size="15" fill="#abb2bf">a = [3, 1, 4, 2, 5, 0]</text>
+  <!-- 数组条形 -->
+  <g font-family="monospace" font-size="13" text-anchor="middle">
+    <rect x="70"  y="200" width="60" height="55" rx="4" fill="#e06c75" opacity="0.85"/><text x="100" y="234" fill="#282c34">3</text>
+    <rect x="140" y="170" width="60" height="85" rx="4" fill="#e5c07b" opacity="0.85"/><text x="170" y="218" fill="#282c34">1</text>
+    <rect x="210" y="140" width="60" height="115" rx="4" fill="#98c379" opacity="0.85"/><text x="240" y="204" fill="#282c34">4</text>
+    <rect x="280" y="185" width="60" height="70" rx="4" fill="#61afef" opacity="0.85"/><text x="310" y="227" fill="#282c34">2</text>
+    <rect x="350" y="155" width="60" height="100" rx="4" fill="#c678dd" opacity="0.85"/><text x="380" y="212" fill="#282c34">5</text>
+    <rect x="420" y="215" width="60" height="40" rx="4" fill="#56b6c2" opacity="0.85"/><text x="450" y="242" fill="#282c34">0</text>
+    <!-- 下标 -->
+    <text x="100" y="278" fill="#5c6370">1</text><text x="170" y="278" fill="#5c6370">2</text>
+    <text x="240" y="278" fill="#5c6370">3</text><text x="310" y="278" fill="#5c6370">4</text>
+    <text x="380" y="278" fill="#5c6370">5</text><text x="450" y="278" fill="#5c6370">6</text>
+  </g>
+  <!-- 区间 [2,5] 括号 -->
+  <path d="M132 118 v-10 h246 v10" fill="none" stroke="#61afef" stroke-width="2"/>
+  <text x="255" y="100" font-family="monospace" font-size="13" fill="#61afef" text-anchor="middle">询问区间 [2, 5]</text>
+  <!-- 公式 -->
+  <g font-family="monospace" font-size="15">
+    <text x="498" y="130" fill="#abb2bf">pre[r]−pre[l−1]</text>
+    <text x="520" y="156" fill="#98c379">= 15 − 3</text>
+    <text x="520" y="182" fill="#e5c07b">= 12</text>
+  </g>
+  <!-- 面积差示意 -->
+  <rect x="520" y="196" width="88" height="12" rx="3" fill="#98c379" opacity="0.8"/>
+  <rect x="520" y="196" width="18" height="12" rx="3" fill="#e06c75" opacity="0.9"/>
+  <text x="520" y="246" font-family="monospace" font-size="11" fill="#5c6370">绿条 = 前缀和</text>
+  <text x="520" y="262" font-family="monospace" font-size="11" fill="#5c6370">红块 = 减掉的前段</text>
+  <text x="24" y="290" font-family="monospace" font-size="11" fill="#5c6370">一次 O(n) 预处理，之后每次询问 O(1)</text>
+</svg>

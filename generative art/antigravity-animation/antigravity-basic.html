@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Antigravity Success</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            font-family: 'Google Sans', Roboto, Arial, sans-serif;
+        }
+
+        /* Dynamic Background handled by JS, but default here */
+        body {
+            background-color: #ffffff;
+            transition: background-color 0.5s ease;
+        }
+
+        canvas {
+            display: block;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 1;
+        }
+
+        #content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 10;
+            text-align: center;
+            pointer-events: none; /* Let clicks pass through to canvas */
+        }
+
+        .icon-container {
+            width: 80px;
+            height: 80px;
+            background: #E8F0FE;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 24px;
+            animation: popIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        .check-icon {
+            width: 40px;
+            height: 40px;
+            fill: #1967D2;
+            stroke: #1967D2;
+            stroke-width: 3;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            opacity: 0;
+            animation: drawCheck 0.5s ease 0.4s forwards;
+        }
+
+        h1 {
+            color: #202124;
+            font-size: 24px;
+            margin: 0 0 8px 0;
+            opacity: 0;
+            animation: fadeUp 0.6s ease 0.2s forwards;
+        }
+
+        p {
+            color: #5f6368;
+            font-size: 14px;
+            margin: 0;
+            opacity: 0;
+            animation: fadeUp 0.6s ease 0.3s forwards;
+        }
+
+        #controls {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            z-index: 20;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 15px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            font-size: 12px;
+            max-width: 250px;
+            pointer-events: auto;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(0,0,0,0.05);
+            transition: opacity 0.3s;
+        }
+
+        #controls.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .code-snippet {
+            background: #f1f3f4;
+            padding: 8px;
+            border-radius: 4px;
+            margin-top: 8px;
+            font-family: monospace;
+            word-break: break-all;
+            cursor: pointer;
+            border: 1px solid #dadce0;
+        }
+
+        @keyframes popIn {
+            from { transform: scale(0); }
+            to { transform: scale(1); }
+        }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes drawCheck {
+            from { stroke-dasharray: 0, 100; opacity: 0; }
+            to { stroke-dasharray: 100, 0; opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="canvas"></canvas>
+
+    <div id="content">
+        <div class="icon-container">
+            <svg class="check-icon" viewBox="0 0 24 24">
+                <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+        </div>
+        <h1 id="title-text">Success</h1>
+        <p id="subtitle-text">You have successfully signed in.</p>
+    </div>
+
+    <div id="controls">
+        <strong>Customize via URL:</strong>
+        <div style="margin-top:4px; color:#666;">Try adding parameters:</div>
+        <div class="code-snippet" onclick="copyUrl(1)">?speed=2&count=50</div>
+        <div class="code-snippet" onclick="copyUrl(2)">?bg=1a1a1a&fill=e91e63,00bcd4</div>
+        <div class="code-snippet" onclick="copyUrl(3)">?shape=circle&gravity=0.5</div>
+        <div style="margin-top:10px; font-size: 10px; color: #999;">Click snippet to reload</div>
+    </div>
+
+    <script>
+        // --- Configuration & URL Parsing ---
+        const params = new URLSearchParams(window.location.search);
+        
+        const config = {
+            particleCount: parseInt(params.get('count')) || 45,
+            speedFactor: parseFloat(params.get('speed')) || 0.8,
+            bgColor: params.get('bg') ? '#' + params.get('bg').replace('#','') : '#ffffff',
+            // Colors: Google standard or custom palette
+            colors: params.get('fill') 
+                ? params.get('fill').split(',').map(c => '#' + c.replace('#','')) 
+                : ['#EA4335', '#FBBC05', '#34A853', '#4285F4', '#E8F0FE', '#DADCE0'],
+            shape: params.get('shape') || 'mixed', // mixed, circle, square, triangle
+            gravity: parseFloat(params.get('gravity')) || -0.05, // Negative for antigravity (up)
+            interactionRadius: 150,
+            friction: 0.98
+        };
+
+        // Dark mode adjustments for text if bg is dark
+        function isDark(color) {
+            const hex = color.replace('#', '');
+            const r = parseInt(hex.substr(0, 2), 16);
+            const g = parseInt(hex.substr(2, 2), 16);
+            const b = parseInt(hex.substr(4, 2), 16);
+            return ((r * 299) + (g * 587) + (b * 114)) / 1000 < 128;
+        }
+
+        if (isDark(config.bgColor)) {
+            document.body.style.backgroundColor = config.bgColor;
+            document.querySelector('h1').style.color = '#ffffff';
+            document.querySelector('p').style.color = '#dadce0';
+            document.querySelector('.icon-container').style.background = 'rgba(255,255,255,0.1)';
+        } else {
+            document.body.style.backgroundColor = config.bgColor;
+        }
+
+        // --- Canvas Setup ---
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        let width, height;
+        
+        // High DPI scaling
+        function resize() {
+            const dpr = window.devicePixelRatio || 1;
+            width = window.innerWidth;
+            height = window.innerHeight;
+            
+            canvas.width = width * dpr;
+            canvas.height = height * dpr;
+            canvas.style.width = `${width}px`;
+            canvas.style.height = `${height}px`;
+            ctx.scale(dpr, dpr);
+        }
+        
+        window.addEventListener('resize', resize);
+        resize();
+
+        // --- Physics & Shapes ---
+
+        class Particle {
+            constructor() {
+                this.init(true);
+            }
+
+            init(randomY = false) {
+                this.x = Math.random() * width;
+                // If randomY is true, scatter across screen (initial load)
+                // Otherwise spawn at bottom (for antigravity flow)
+                this.y = randomY ? Math.random() * height : height + 50;
+                
+                this.size = Math.random() * 15 + 5; // Base size
+                this.targetSize = this.size;
+                
+                // Random velocity
+                this.vx = (Math.random() - 0.5) * 2 * config.speedFactor;
+                this.vy = (Math.random() - 0.5) * 2 * config.speedFactor;
+                
+                // Add inherent upward/downward bias based on gravity config
+                // If gravity is negative (antigravity), spawn bias is upward
+                if (config.gravity < 0) {
+                    this.vy -= Math.random() * 1 * Math.abs(config.gravity);
+                } else {
+                    this.y = randomY ? Math.random() * height : -50;
+                }
+
+                this.color = config.colors[Math.floor(Math.random() * config.colors.length)];
+                this.rotation = Math.random() * Math.PI * 2;
+                this.rotationSpeed = (Math.random() - 0.5) * 0.05;
+                
+                // 0 = Circle, 1 = Square, 2 = Triangle
+                this.type = this.getShapeType();
+                
+                // Fake 3D depth factor (0.5 to 1.5)
+                this.depth = Math.random() * 1 + 0.5; 
+            }
+
+            getShapeType() {
+                if (config.shape === 'circle') return 0;
+                if (config.shape === 'square') return 1;
+                if (config.shape === 'triangle') return 2;
+                // Mixed
+                return Math.floor(Math.random() * 3);
+            }
+
+            update(mouseX, mouseY) {
+                // Apply gravity/antigravity
+                this.vy += config.gravity * 0.05 * this.depth;
+                
+                // Movement
+                this.x += this.vx * this.depth;
+                this.y += this.vy * this.depth;
+                this.rotation += this.rotationSpeed;
+
+                // Mouse Interaction (Repel)
+                const dx = this.x - mouseX;
+                const dy = this.y - mouseY;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+
+                if (dist < config.interactionRadius) {
+                    const force = (config.interactionRadius - dist) / config.interactionRadius;
+                    const angle = Math.atan2(dy, dx);
+                    const push = force * 4; // Push strength
+                    
+                    this.vx += Math.cos(angle) * push;
+                    this.vy += Math.sin(angle) * push;
+                }
+
+                // Friction (air resistance)
+                this.vx *= config.friction;
+                this.vy *= config.friction;
+
+                // Bounds checking - wrap around or reset
+                // Side walls
+                if (this.x < -50) this.x = width + 50;
+                if (this.x > width + 50) this.x = -50;
+                
+                // Vertical reset
+                if (config.gravity < 0) {
+                    // Going up
+                    if (this.y < -60) this.init(false); // Reset to bottom
+                } else {
+                    // Going down
+                    if (this.y > height + 60) this.init(false); // Reset to top
+                }
+            }
+
+            draw() {
+                ctx.save();
+                ctx.translate(this.x, this.y);
+                ctx.rotate(this.rotation);
+                ctx.fillStyle = this.color;
+                
+                // Add a subtle shadow to simulate depth
+                ctx.shadowColor = "rgba(0,0,0,0.05)";
+                ctx.shadowBlur = 10 * this.depth;
+                ctx.shadowOffsetX = 5;
+                ctx.shadowOffsetY = 5;
+
+                const s = this.size * this.depth;
+
+                ctx.beginPath();
+                if (this.type === 0) {
+                    // Circle
+                    ctx.arc(0, 0, s/2, 0, Math.PI * 2);
+                } else if (this.type === 1) {
+                    // Square
+                    ctx.rect(-s/2, -s/2, s, s);
+                } else if (this.type === 2) {
+                    // Triangle
+                    ctx.moveTo(0, -s/2);
+                    ctx.lineTo(s/2, s/2);
+                    ctx.lineTo(-s/2, s/2);
+                    ctx.closePath();
+                } else {
+                     // Random polygons for mixed variety if index expands
+                     ctx.rect(-s/2, -s/2, s, s);
+                }
+                
+                ctx.fill();
+                ctx.restore();
+            }
+        }
+
+        // --- Animation Loop ---
+        const particles = [];
+        for(let i = 0; i < config.particleCount; i++) {
+            particles.push(new Particle());
+        }
+
+        let mouseX = -1000;
+        let mouseY = -1000;
+
+        window.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+        });
+
+        // Touch support
+        window.addEventListener('touchmove', (e) => {
+            mouseX = e.touches[0].clientX;
+            mouseY = e.touches[0].clientY;
+        });
+
+        function animate() {
+            ctx.clearRect(0, 0, width, height);
+            
+            particles.forEach(p => {
+                p.update(mouseX, mouseY);
+                p.draw();
+            });
+
+            requestAnimationFrame(animate);
+        }
+
+        animate();
+
+        // --- Helpers ---
+        function copyUrl(type) {
+            let url = window.location.origin + window.location.pathname;
+            if(type === 1) url += "?speed=2&count=80";
+            if(type === 2) url += "?bg=1a1a1a&fill=e91e63,00bcd4,9c27b0&shape=triangle";
+            if(type === 3) url += "?shape=circle&gravity=0.2&bg=fdf6e3&fill=b58900,cb4b16,dc322f";
+            window.location.href = url;
+        }
+
+    </script>
+</body>
+</html>

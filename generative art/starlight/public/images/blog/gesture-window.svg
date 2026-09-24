@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 300" role="img" aria-label="用户手势激活窗口：错误路径先等网络后播被拒，正确路径点击即播">
+  <defs>
+    <linearGradient id="gwBg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#282c34"/>
+      <stop offset="1" stop-color="#21252b"/>
+    </linearGradient>
+  </defs>
+  <rect width="640" height="300" rx="10" fill="url(#gwBg)"/>
+  <text x="24" y="34" font-family="monospace" font-size="15" fill="#abb2bf">用户手势激活窗口：play() 为什么必须「点下去就调用」</text>
+
+  <!-- 错误路径 -->
+  <g font-family="monospace" font-size="12">
+    <text x="24" y="72" fill="#e06c75" text-anchor="start">✗ 错误：await 下载完再播</text>
+    <!-- 时间轴 -->
+    <line x1="24" y1="104" x2="616" y2="104" stroke="#5c6370" stroke-width="1.5"/>
+    <!-- 手势窗口（很短） -->
+    <rect x="24" y="90" width="64" height="28" rx="4" fill="#98c379" opacity="0.28"/>
+    <rect x="24" y="90" width="64" height="28" rx="4" fill="none" stroke="#98c379" stroke-dasharray="4 3"/>
+    <text x="56" y="82" fill="#98c379" text-anchor="middle">手势窗口</text>
+    <!-- 下载长条 -->
+    <rect x="100" y="94" width="380" height="20" rx="4" fill="#61afef" opacity="0.35"/>
+    <text x="290" y="108" fill="#61afef" text-anchor="middle">await fetch(音频 1.6MB) …数秒…</text>
+    <!-- play 被拒 -->
+    <circle cx="512" cy="104" r="11" fill="#e06c75" opacity="0.9"/>
+    <text x="512" y="109" fill="#282c34" text-anchor="middle" font-size="13" font-weight="bold">✕</text>
+    <text x="532" y="108" fill="#e06c75">play() 被拒</text>
+    <text x="532" y="124" fill="#5c6370" font-size="10">NotAllowedError</text>
+  </g>
+
+  <!-- 正确路径 -->
+  <g font-family="monospace" font-size="12">
+    <text x="24" y="170" fill="#98c379" text-anchor="start">✓ 正确：点击瞬间 play()，下载放后台</text>
+    <line x1="24" y1="202" x2="616" y2="202" stroke="#5c6370" stroke-width="1.5"/>
+    <rect x="24" y="188" width="64" height="28" rx="4" fill="#98c379" opacity="0.28"/>
+    <rect x="24" y="188" width="64" height="28" rx="4" fill="none" stroke="#98c379" stroke-dasharray="4 3"/>
+    <!-- 立即 play -->
+    <circle cx="112" cy="202" r="11" fill="#98c379" opacity="0.9"/>
+    <path d="M 108 196 L 120 202 L 108 208 Z" fill="#282c34"/>
+    <text x="132" y="206" fill="#98c379">play() 同步发起</text>
+    <!-- 后台下载 -->
+    <rect x="280" y="192" width="240" height="20" rx="4" fill="#c678dd" opacity="0.3"/>
+    <text x="400" y="206" fill="#c678dd" text-anchor="middle">后台 blob 预取（下次点击秒播）</text>
+  </g>
+
+  <!-- 结论 -->
+  <rect x="24" y="240" width="592" height="42" rx="8" fill="#e5c07b" opacity="0.08"/>
+  <text x="40" y="258" font-family="monospace" font-size="12.5" fill="#e5c07b">浏览器只把「出声的许可」发给手势那几秒——任何 await 网络，</text>
+  <text x="40" y="274" font-family="monospace" font-size="12.5" fill="#e5c07b">都是在把自己的播放许可亲手等没。</text>
+</svg>

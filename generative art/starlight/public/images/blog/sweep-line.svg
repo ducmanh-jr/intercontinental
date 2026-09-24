@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 300" role="img" aria-label="扫描线最大重叠示意">
+  <defs>
+    <linearGradient id="slBg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#282c34"/>
+      <stop offset="1" stop-color="#21252b"/>
+    </linearGradient>
+  </defs>
+  <rect width="640" height="300" rx="10" fill="url(#slBg)"/>
+  <!-- 数轴 -->
+  <line x1="50" y1="230" x2="590" y2="230" stroke="#5c6370" stroke-width="1.5"/>
+  <g font-family="monospace" font-size="11" fill="#5c6370" text-anchor="middle">
+    <text x="90" y="250">1</text><text x="150" y="250">2</text><text x="210" y="250">3</text>
+    <text x="270" y="250">4</text><text x="330" y="250">5</text><text x="390" y="250">6</text>
+    <text x="450" y="250">7</text><text x="510" y="250">8</text><text x="570" y="250">9</text>
+  </g>
+  <!-- 三个区间（已向左延伸 k） -->
+  <g stroke-width="5" stroke-linecap="round" fill="none">
+    <line x1="70"  y1="90"  x2="290" y2="90"  stroke="#e06c75" opacity="0.85"/>
+    <line x1="130" y1="120" x2="410" y2="120" stroke="#e5c07b" opacity="0.85"/>
+    <line x1="230" y1="150" x2="470" y2="150" stroke="#61afef" opacity="0.85"/>
+  </g>
+  <g font-family="monospace" font-size="12">
+    <text x="76"  y="82"  fill="#e06c75">区间① [1−k, 3]</text>
+    <text x="136" y="112" fill="#e5c07b">区间② [2−k, 4]</text>
+    <text x="236" y="172" fill="#61afef">区间③ [3−k, 5]</text>
+  </g>
+  <!-- 事件点：+1 / -1 -->
+  <g font-family="monospace" font-size="12" text-anchor="middle">
+    <circle cx="70" cy="230" r="4" fill="#98c379"/><text x="70" y="212" fill="#98c379">+1</text>
+    <circle cx="130" cy="230" r="4" fill="#98c379"/><text x="130" y="212" fill="#98c379">+1</text>
+    <circle cx="230" cy="230" r="4" fill="#98c379"/><text x="230" y="212" fill="#98c379">+1</text>
+    <circle cx="290" cy="230" r="4" fill="#c678dd"/><text x="290" y="272" fill="#c678dd">−1</text>
+    <circle cx="410" cy="230" r="4" fill="#c678dd"/><text x="410" y="272" fill="#c678dd">−1</text>
+    <circle cx="470" cy="230" r="4" fill="#c678dd"/><text x="470" y="272" fill="#c678dd">−1</text>
+  </g>
+  <!-- 前缀和阶梯曲线（覆盖层数） -->
+  <path d="M50 230 H70 V196 H130 V162 H230 V128 H290 V162 H410 V196 H470 V230 H590"
+        fill="none" stroke="#56b6c2" stroke-width="2" stroke-dasharray="5 3"/>
+  <!-- 峰值标注 -->
+  <circle cx="260" cy="128" r="5" fill="none" stroke="#98c379" stroke-width="2"/>
+  <text x="260" y="98" font-family="monospace" font-size="14" fill="#98c379" text-anchor="middle">max = 3</text>
+  <text x="24" y="36" font-family="monospace" font-size="15" fill="#abb2bf">扫描线：区间 → ±1 事件 → 前缀和取最大</text>
+  <text x="24" y="288" font-family="monospace" font-size="11" fill="#5c6370">统一左移 k 后重叠层数不变——先化简，再套模板</text>
+</svg>

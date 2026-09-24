@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 300" role="img" aria-label="梯子形排列与矩阵快速幂示意">
+  <defs>
+    <linearGradient id="mpBg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#282c34"/>
+      <stop offset="1" stop-color="#21252b"/>
+    </linearGradient>
+  </defs>
+  <rect width="640" height="300" rx="10" fill="url(#mpBg)"/>
+  <text x="24" y="34" font-family="monospace" font-size="15" fill="#abb2bf">梯子形玩具：上下横档各 5 圆 + 三根 341799 高竖柱</text>
+  <!-- 上横档：5 个圆 -->
+  <g font-family="monospace" font-size="11" text-anchor="middle">
+    <circle cx="110" cy="70" r="13" fill="#e5c07b" opacity="0.85"/><text x="110" y="74" fill="#282c34">a</text>
+    <circle cx="170" cy="70" r="13" fill="#61afef" opacity="0.85"/><text x="170" y="74" fill="#282c34">b</text>
+    <circle cx="230" cy="70" r="13" fill="#e5c07b" opacity="0.85"/><text x="230" y="74" fill="#282c34">c</text>
+    <circle cx="290" cy="70" r="13" fill="#61afef" opacity="0.85"/><text x="290" y="74" fill="#282c34">d</text>
+    <circle cx="350" cy="70" r="13" fill="#e5c07b" opacity="0.85"/><text x="350" y="74" fill="#282c34">e</text>
+  </g>
+  <!-- 下横档：5 个圆 -->
+  <g font-family="monospace" font-size="11" text-anchor="middle">
+    <circle cx="110" cy="230" r="13" fill="#61afef" opacity="0.85"/><text x="110" y="234" fill="#282c34">f</text>
+    <circle cx="170" cy="230" r="13" fill="#e5c07b" opacity="0.85"/><text x="170" y="234" fill="#282c34">g</text>
+    <circle cx="230" cy="230" r="13" fill="#61afef" opacity="0.85"/><text x="230" y="234" fill="#282c34">h</text>
+    <circle cx="290" cy="230" r="13" fill="#e5c07b" opacity="0.85"/><text x="290" y="234" fill="#282c34">i</text>
+    <circle cx="350" cy="230" r="13" fill="#61afef" opacity="0.85"/><text x="350" y="234" fill="#282c34">j</text>
+  </g>
+  <!-- 三根竖柱（用双线轨道表示，省略中间的 341797 个圆） -->
+  <g stroke="#5c6370" stroke-width="1">
+    <line x1="102" y1="86" x2="102" y2="214"/><line x1="118" y1="86" x2="118" y2="214"/>
+    <line x1="222" y1="86" x2="222" y2="214"/><line x1="238" y1="86" x2="238" y2="214"/>
+    <line x1="342" y1="86" x2="342" y2="214"/><line x1="358" y1="86" x2="358" y2="214"/>
+  </g>
+  <g fill="#5c6370">
+    <circle cx="110" cy="110" r="3"/><circle cx="110" cy="135" r="3"/><circle cx="110" cy="160" r="3"/><circle cx="110" cy="185" r="3"/>
+    <circle cx="230" cy="110" r="3"/><circle cx="230" cy="135" r="3"/><circle cx="230" cy="160" r="3"/><circle cx="230" cy="185" r="3"/>
+    <circle cx="350" cy="110" r="3"/><circle cx="350" cy="135" r="3"/><circle cx="350" cy="160" r="3"/><circle cx="350" cy="185" r="3"/>
+  </g>
+  <text x="230" y="152" font-family="monospace" font-size="11" fill="#5c6370" text-anchor="middle">⋮ 每柱 341799 圆 ⋮</text>
+  <!-- 相切约束标注 -->
+  <path d="M124 70 h18" fill="none" stroke="#e06c75" stroke-width="2"/>
+  <path d="M244 70 h18" fill="none" stroke="#e06c75" stroke-width="2"/>
+  <path d="M304 70 h18" fill="none" stroke="#e06c75" stroke-width="2"/>
+  <text x="200" y="46" font-family="monospace" font-size="11" fill="#e06c75" text-anchor="middle">相切两圆不能都是元音（黄=元音 蓝=辅音）</text>
+  <!-- 转移矩阵与快速幂 -->
+  <g font-family="monospace">
+    <text x="430" y="100" font-size="13" fill="#abb2bf" text-anchor="start">每根竖柱是同构长链：</text>
+    <text x="430" y="124" font-size="13" fill="#98c379" text-anchor="start">上端⊕ → 下端⊕ 的转移数</text>
+    <text x="430" y="146" font-size="13" fill="#98c379" text-anchor="start">= 矩阵 A 的 341797 次幂</text>
+  </g>
+  <g font-family="monospace" font-size="12" text-anchor="middle">
+    <rect x="430" y="164" width="58" height="26" rx="13" fill="#21252b" stroke="#c678dd"/><text x="459" y="181" fill="#c678dd">A¹</text>
+    <rect x="496" y="164" width="58" height="26" rx="13" fill="#21252b" stroke="#c678dd"/><text x="525" y="181" fill="#c678dd">A²</text>
+    <rect x="562" y="164" width="58" height="26" rx="13" fill="#21252b" stroke="#c678dd"/><text x="591" y="181" fill="#c678dd">A⁴</text>
+    <rect x="430" y="198" width="58" height="26" rx="13" fill="#21252b" stroke="#c678dd"/><text x="459" y="215" fill="#c678dd">A⁸</text>
+    <rect x="496" y="198" width="58" height="26" rx="13" fill="#21252b" stroke="#c678dd"/><text x="525" y="215" fill="#c678dd">A¹⁶</text>
+    <rect x="562" y="198" width="58" height="26" rx="13" fill="#21252b" stroke="#c678dd"/><text x="591" y="215" fill="#c678dd">…</text>
+  </g>
+  <text x="520" y="248" font-family="monospace" font-size="12" fill="#56b6c2" text-anchor="middle">19 次矩阵乘 ≈ 算完百万级链</text>
+  <text x="24" y="272" font-family="monospace" font-size="11" fill="#5c6370">26 种字母坍缩成 1 bit（元音/辅音），横档状态 2⁵ = 32 个掩码</text>
+  <text x="24" y="290" font-family="monospace" font-size="11" fill="#5c6370">f(i+1) = A·f(i) 型线性递推：n 步 = Aⁿ = 快速幂 log n 次矩阵乘</text>
+</svg>

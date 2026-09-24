@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 300" role="img" aria-label="区间异或转增量后 Kadane 求最优子段示意">
+  <defs>
+    <linearGradient id="kdBg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#282c34"/>
+      <stop offset="1" stop-color="#21252b"/>
+    </linearGradient>
+  </defs>
+  <rect width="640" height="300" rx="10" fill="url(#kdBg)"/>
+  <text x="24" y="34" font-family="monospace" font-size="15" fill="#abb2bf">区间整体 ⊕k：只看「变化量」序列 dif = (a[i]⊕k) − a[i]</text>
+  <!-- 原数组 -->
+  <g font-family="monospace" font-size="13" text-anchor="middle">
+    <text x="24" y="76" fill="#5c6370" text-anchor="start">a   =</text>
+    <rect x="90"  y="56" width="56" height="30" rx="5" fill="#61afef" opacity="0.8"/><text x="118" y="76" fill="#282c34">4</text>
+    <rect x="154" y="56" width="56" height="30" rx="5" fill="#61afef" opacity="0.8"/><text x="182" y="76" fill="#282c34">7</text>
+    <rect x="218" y="56" width="56" height="30" rx="5" fill="#61afef" opacity="0.8"/><text x="246" y="76" fill="#282c34">3</text>
+    <rect x="282" y="56" width="56" height="30" rx="5" fill="#61afef" opacity="0.8"/><text x="310" y="76" fill="#282c34">9</text>
+    <rect x="346" y="56" width="56" height="30" rx="5" fill="#61afef" opacity="0.8"/><text x="374" y="76" fill="#282c34">5</text>
+  </g>
+  <!-- 变化量数组：正负相间 -->
+  <g font-family="monospace" font-size="13" text-anchor="middle">
+    <text x="24" y="140" fill="#5c6370" text-anchor="start">dif =</text>
+    <rect x="90"  y="112" width="56" height="40" rx="5" fill="#e06c75" opacity="0.85"/><text x="118" y="137" fill="#282c34">−2</text>
+    <rect x="154" y="120" width="56" height="40" rx="5" fill="#e06c75" opacity="0.85"/><text x="182" y="145" fill="#282c34">−6</text>
+    <rect x="218" y="104" width="56" height="40" rx="5" fill="#98c379" opacity="0.85"/><text x="246" y="129" fill="#282c34">+2</text>
+    <rect x="282" y="112" width="56" height="40" rx="5" fill="#98c379" opacity="0.85"/><text x="310" y="137" fill="#282c34">+6</text>
+    <rect x="346" y="120" width="56" height="40" rx="5" fill="#e06c75" opacity="0.85"/><text x="374" y="145" fill="#282c34">−2</text>
+  </g>
+  <!-- 最优子段框：选 [3,4] -->
+  <rect x="212" y="96" width="140" height="58" rx="8" fill="none" stroke="#e5c07b" stroke-width="2" stroke-dasharray="6 4"/>
+  <text x="282" y="176" font-family="monospace" font-size="12" fill="#e5c07b" text-anchor="middle">最大子段 [3,4] = +8</text>
+  <text x="146" y="176" font-family="monospace" font-size="12" fill="#56b6c2" text-anchor="middle">最小子段 [1,2] = −8</text>
+  <g font-family="monospace" font-size="13">
+    <text x="450" y="76" fill="#abb2bf" text-anchor="start">答案 = Σa</text>
+    <text x="450" y="98" fill="#e5c07b" text-anchor="start">　　± max/min(子段和)</text>
+    <text x="450" y="120" fill="#5c6370" text-anchor="start">（取 0 = 不浇水）</text>
+    <text x="450" y="152" fill="#56b6c2" text-anchor="start">一趟扫描同时维护：</text>
+    <text x="450" y="172" fill="#56b6c2" text-anchor="start">curx = max(0, curx+dif)</text>
+    <text x="450" y="192" fill="#56b6c2" text-anchor="start">curn = min(0, curn+dif)</text>
+  </g>
+  <text x="24" y="222" font-family="monospace" font-size="12" fill="#98c379">“选一个区间做变换” → 变换只影响区间内 → 等价于在增量序列上选子段</text>
+  <text x="24" y="246" font-family="monospace" font-size="11" fill="#5c6370">区间外恒为 0（不变），区间内为 dif——选区间就是选子段，Kadane 十行收工</text>
+  <text x="24" y="288" font-family="monospace" font-size="11" fill="#5c6370">洛谷蓝桥杯国赛模拟 2026 · 盆栽（k=6 示例：4⊕6=2，7⊕6=1，3⊕6=5，9⊕6=15，5⊕6=3）</text>
+</svg>

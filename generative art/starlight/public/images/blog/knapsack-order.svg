@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 320" role="img" aria-label="01背包倒序与完全背包正序示意">
+  <defs>
+    <linearGradient id="koBg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#282c34"/>
+      <stop offset="1" stop-color="#21252b"/>
+    </linearGradient>
+  </defs>
+  <rect width="640" height="320" rx="10" fill="url(#koBg)"/>
+  <text x="24" y="34" font-family="monospace" font-size="15" fill="#abb2bf">同一行转移：dp[j] = max(dp[j], dp[j-w] + v)</text>
+
+  <!-- 左：01 背包倒序 -->
+  <g font-family="monospace" font-size="13">
+    <text x="60" y="76" fill="#61afef">01 背包：j 从大到小（倒序）</text>
+    <!-- 格子行 j=5..1 -->
+    <g text-anchor="middle">
+      <rect x="150" y="92"  width="44" height="30" rx="5" fill="#3a3f4b"/><text x="172" y="112" fill="#abb2bf">j=5</text>
+      <rect x="150" y="128" width="44" height="30" rx="5" fill="#3a3f4b"/><text x="172" y="148" fill="#abb2bf">j=4</text>
+      <rect x="150" y="164" width="44" height="30" rx="5" fill="#3a3f4b"/><text x="172" y="184" fill="#abb2bf">j=3</text>
+      <rect x="150" y="200" width="44" height="30" rx="5" fill="#98c379" opacity="0.85"/><text x="172" y="220" fill="#282c34">j=2</text>
+      <rect x="150" y="236" width="44" height="30" rx="5" fill="#3a3f4b"/><text x="172" y="256" fill="#abb2bf">j=1</text>
+    </g>
+    <!-- 更新方向箭头：向下 -->
+    <path d="M120 100 v150" stroke="#98c379" stroke-width="2" marker-end="url(#koArrow)"/>
+    <text x="104" y="180" fill="#98c379" transform="rotate(-90 104 180)" text-anchor="middle">更新顺序</text>
+    <text x="60" y="292" fill="#abb2bf">读 dp[j−w] 时它还是</text>
+    <text x="60" y="310" fill="#abb2bf">「上一个物品」的值 ✓</text>
+  </g>
+
+  <!-- 右：完全背包正序 -->
+  <g font-family="monospace" font-size="13">
+    <text x="380" y="76" fill="#c678dd">完全背包：j 从小到大（正序）</text>
+    <g text-anchor="middle">
+      <rect x="470" y="92"  width="44" height="30" rx="5" fill="#3a3f4b"/><text x="492" y="112" fill="#abb2bf">j=1</text>
+      <rect x="470" y="128" width="44" height="30" rx="5" fill="#3a3f4b"/><text x="492" y="148" fill="#abb2bf">j=2</text>
+      <rect x="470" y="164" width="44" height="30" rx="5" fill="#e5c07b" opacity="0.85"/><text x="492" y="184" fill="#282c34">j=3</text>
+      <rect x="470" y="200" width="44" height="30" rx="5" fill="#3a3f4b"/><text x="492" y="220" fill="#abb2bf">j=4</text>
+      <rect x="470" y="236" width="44" height="30" rx="5" fill="#3a3f4b"/><text x="492" y="256" fill="#abb2bf">j=5</text>
+    </g>
+    <path d="M440 100 v150" stroke="#c678dd" stroke-width="2" marker-end="url(#koArrow2)"/>
+    <text x="380" y="292" fill="#abb2bf">读 dp[j−w] 时它已包含</text>
+    <text x="380" y="310" fill="#abb2bf">「当前物品」→ 可重复取 ✓</text>
+  </g>
+
+  <defs>
+    <marker id="koArrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" fill="#98c379"/>
+    </marker>
+    <marker id="koArrow2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" fill="#c678dd"/>
+    </marker>
+  </defs>
+</svg>

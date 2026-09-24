@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Antigravity Success</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            font-family: 'Google Sans', Roboto, Arial, sans-serif;
+        }
+
+        /* Dynamic Background handled by JS, but default here */
+        body {
+            background-color: #ffffff;
+            transition: background-color 0.5s ease;
+        }
+
+        canvas {
+            display: block;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 1;
+            /* Force GPU acceleration hint */
+            will-change: transform; 
+        }
+
+        #content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 10;
+            text-align: center;
+            pointer-events: none; /* Let clicks pass through to canvas */
+        }
+
+        .icon-container {
+            width: 80px;
+            height: 80px;
+            background: #E8F0FE;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 24px;
+            animation: popIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        .check-icon {
+            width: 40px;
+            height: 40px;
+            fill: #1967D2;
+            stroke: #1967D2;
+            stroke-width: 3;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            opacity: 0;
+            animation: drawCheck 0.5s ease 0.4s forwards;
+        }
+
+        h1 {
+            color: #202124;
+            font-size: 24px;
+            margin: 0 0 8px 0;
+            opacity: 0;
+            animation: fadeUp 0.6s ease 0.2s forwards;
+        }
+
+        p {
+            color: #5f6368;
+            font-size: 14px;
+            margin: 0;
+            opacity: 0;
+            animation: fadeUp 0.6s ease 0.3s forwards;
+        }
+
+        #controls {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            z-index: 20;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 15px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            font-size: 12px;
+            max-width: 250px;
+            pointer-events: auto;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(0,0,0,0.05);
+            transition: opacity 0.3s;
+        }
+
+        #controls.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .code-snippet {
+            background: #f1f3f4;
+            padding: 8px;
+            border-radius: 4px;
+            margin-top: 8px;
+            font-family: monospace;
+            word-break: break-all;
+            cursor: pointer;
+            border: 1px solid #dadce0;
+        }
+
+        @keyframes popIn {
+            from { transform: scale(0); }
+            to { transform: scale(1); }
+        }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes drawCheck {
+            from { stroke-dasharray: 0, 100; opacity: 0; }
+            to { stroke-dasharray: 100, 0; opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="canvas"></canvas>
+
+    <div id="content">
+        <div class="icon-container">
+            <svg class="check-icon" viewBox="0 0 24 24">
+                <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+        </div>
+        <h1 id="title-text">Success</h1>
+        <p id="subtitle-text">You have successfully signed in.</p>
+    </div>
+
+    <div id="controls">
+        <strong>Customize via URL:</strong>
+        <div style="margin-top:4px; color:#666;">Try adding parameters:</div>
+        <div class="code-snippet" onclick="copyUrl(1)">?speed=2&count=50</div>
+        <div class="code-snippet" onclick="copyUrl(2)">?bg=1a1a1a&fill=e91e63,00bcd4</div>
+        <div class="code-snippet" onclick="copyUrl(3)">?shape=circle&gravity=0.5</div>
+        <div class="code-snippet" onclick="copyUrl(4)">?pattern=true&shape=triangle</div>
+        <div style="margin-top:10px; font-size: 10px; color: #999;">Click snippet to reload</div>
+    </div>
+
+    <script>
+        // --- Configuration & URL Parsing ---
+        const params = new URLSearchParams(window.location.search);
+        
+        const config = {
+            particleCount: parseInt(params.get('count')) || 45,
+            speedFactor: parseFloat(params.get('speed')) || 0.8,
+            bgColor: params.get('bg') ? '#' + params.get('bg').replace('#','') : '#ffffff',
+            colors: params.get('fill') 
+                ? params.get('fill').split(',').map(c => '#' + c.replace('#','')) 
+                : ['#EA4335', '#FBBC05', '#34A853', '#4285F4', '#E8F0FE', '#DADCE0'],
+            shape: params.get('shape') || 'mixed', // mixed, circle, square, triangle
+            gravity: parseFloat(params.get('gravity')) || -0.05,
+            usePattern: params.get('pattern') === 'true',
+            interactionRadius: 150,
+            friction: 0.96
+        };
+
+        // Dark mode adjustments
+        function isDark(color) {
+            const hex = color.replace('#', '');
+            const r = parseInt(hex.substr(0, 2), 16);
+            const g = parseInt(hex.substr(2, 2), 16);
+            const b = parseInt(hex.substr(4, 2), 16);
+            return ((r * 299) + (g * 587) + (b * 114)) / 1000 < 128;
+        }
+
+        if (isDark(config.bgColor)) {
+            document.body.style.backgroundColor = config.bgColor;
+            document.querySelector('h1').style.color = '#ffffff';
+            document.querySelector('p').style.color = '#dadce0';
+            document.querySelector('.icon-container').style.background = 'rgba(255,255,255,0.1)';
+        } else {
+            document.body.style.backgroundColor = config.bgColor;
+        }
+
+        // --- High Performance Sprite Generator ---
+        // Pre-renders shapes to offscreen canvases so we just draw images (GPU textures)
+        // instead of calculating vector paths and shadows every frame.
+        const spriteCache = {};
+
+        function getSprite(color, shapeType) {
+            const key = `${color}-${shapeType}`;
+            if (spriteCache[key]) return spriteCache[key];
+
+            const size = 64; // High res for crispness
+            const center = size / 2;
+            const drawSize = 30; // Size of the shape within the canvas
+            
+            const c = document.createElement('canvas');
+            c.width = size;
+            c.height = size;
+            const cx = c.getContext('2d');
+
+            // Bake Shadow
+            cx.shadowColor = "rgba(0,0,0,0.08)";
+            cx.shadowBlur = 15;
+            cx.shadowOffsetX = 5;
+            cx.shadowOffsetY = 5;
+            cx.fillStyle = color;
+
+            cx.translate(center, center);
+
+            cx.beginPath();
+            if (shapeType === 0) { // Circle
+                cx.arc(0, 0, drawSize/2, 0, Math.PI * 2);
+            } else if (shapeType === 1) { // Square
+                cx.rect(-drawSize/2, -drawSize/2, drawSize, drawSize);
+            } else if (shapeType === 2) { // Triangle
+                cx.moveTo(0, -drawSize/2);
+                cx.lineTo(drawSize/2, drawSize/2);
+                cx.lineTo(-drawSize/2, drawSize/2);
+                cx.closePath();
+            }
+            cx.fill();
+
+            spriteCache[key] = c;
+            return c;
+        }
+
+        // --- Canvas Setup ---
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d', { 
+            alpha: true,
+            desynchronized: true, // Allow async rendering for better performance
+            willReadFrequently: false // Optimize for GPU rendering
+        });
+        let width, height;
+        
+        // Optimize canvas rendering settings for GPU
+        ctx.imageSmoothingEnabled = true;
+        ctx.imageSmoothingQuality = 'high';
+        
+        function resize() {
+            const dpr = window.devicePixelRatio || 1;
+            width = window.innerWidth;
+            height = window.innerHeight;
+            
+            canvas.width = width * dpr;
+            canvas.height = height * dpr;
+            canvas.style.width = `${width}px`;
+            canvas.style.height = `${height}px`;
+            ctx.scale(dpr, dpr);
+            
+            // Re-apply settings after resize
+            ctx.imageSmoothingEnabled = true;
+            ctx.imageSmoothingQuality = 'high';
+        }
+        
+        window.addEventListener('resize', resize);
+        resize();
+
+        // --- Physics & Shapes ---
+
+        class Particle {
+            constructor(index) {
+                this.index = index;
+                this.init(true);
+            }
+
+            init(randomY = false) {
+                this.x = Math.random() * width;
+                this.y = randomY ? Math.random() * height : height + 50;
+                
+                // Base size logic: The sprite is fixed (64px), so we scale it down
+                // to match the desired visual size (5px to 20px)
+                this.visualSize = Math.random() * 15 + 5; 
+                
+                this.vx = (Math.random() - 0.5) * 2 * config.speedFactor;
+                this.vy = (Math.random() - 0.5) * 2 * config.speedFactor;
+                
+                if (!config.usePattern) {
+                    if (config.gravity < 0) {
+                        this.vy -= Math.random() * 1 * Math.abs(config.gravity);
+                    } else {
+                        this.y = randomY ? Math.random() * height : -50;
+                    }
+                } else if (!randomY) {
+                     this.x = width/2;
+                     this.y = height/2;
+                }
+
+                this.color = config.colors[Math.floor(Math.random() * config.colors.length)];
+                this.rotation = Math.random() * Math.PI * 2;
+                this.rotationSpeed = (Math.random() - 0.5) * 0.05;
+                this.type = this.getShapeType();
+                
+                // Get the pre-rendered sprite for this particle
+                this.sprite = getSprite(this.color, this.type);
+                
+                this.depth = Math.random() * 1 + 0.5; 
+            }
+
+            getShapeType() {
+                if (config.shape === 'circle') return 0;
+                if (config.shape === 'square') return 1;
+                if (config.shape === 'triangle') return 2;
+                return Math.floor(Math.random() * 3);
+            }
+
+            getPatternTarget() {
+                const cx = width / 2;
+                const cy = height / 2;
+                const r = Math.min(width, height) * 0.35;
+                const total = config.particleCount;
+                const t = this.index / total;
+                
+                let tx = cx, ty = cy;
+                let patternType = config.shape === 'mixed' ? 'circle' : config.shape;
+
+                if (patternType === 'circle') {
+                    const angle = t * Math.PI * 2 - Math.PI / 2;
+                    tx = cx + Math.cos(angle) * r;
+                    ty = cy + Math.sin(angle) * r;
+                } 
+                else if (patternType === 'square') {
+                    const side = Math.floor(t * 4);
+                    const subT = (t * 4) % 1;
+                    switch(side) {
+                        case 0: tx = cx - r + (2 * r * subT); ty = cy - r; break;
+                        case 1: tx = cx + r; ty = cy - r + (2 * r * subT); break;
+                        case 2: tx = cx + r - (2 * r * subT); ty = cy + r; break;
+                        default: tx = cx - r; ty = cy + r - (2 * r * subT); break;
+                    }
+                }
+                else if (patternType === 'triangle') {
+                    const sides = 3;
+                    const sideIdx = Math.floor(t * sides);
+                    const subT = (t * sides) % 1;
+                    const angles = [-Math.PI/2, -Math.PI/2+(Math.PI*2/3), -Math.PI/2+(2*Math.PI*2/3)];
+                    
+                    const a1 = angles[sideIdx];
+                    const a2 = angles[(sideIdx + 1) % 3];
+                    const x1 = cx + Math.cos(a1) * r;
+                    const y1 = cy + Math.sin(a1) * r;
+                    const x2 = cx + Math.cos(a2) * r;
+                    const y2 = cy + Math.sin(a2) * r;
+                    
+                    tx = x1 + (x2 - x1) * subT;
+                    ty = y1 + (y2 - y1) * subT;
+                }
+                return { x: tx, y: ty };
+            }
+
+            update(mouseX, mouseY) {
+                if (config.usePattern) {
+                    const target = this.getPatternTarget();
+                    const dx = target.x - this.x;
+                    const dy = target.y - this.y;
+                    this.vx += dx * 0.003;
+                    this.vy += dy * 0.003;
+                    this.vx += (Math.random() - 0.5) * 0.05;
+                    this.vy += (Math.random() - 0.5) * 0.05;
+                } else {
+                    this.vy += config.gravity * 0.05 * this.depth;
+                }
+                
+                this.x += this.vx * this.depth;
+                this.y += this.vy * this.depth;
+                this.rotation += this.rotationSpeed;
+
+                const dx = this.x - mouseX;
+                const dy = this.y - mouseY;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+
+                if (dist < config.interactionRadius) {
+                    const force = (config.interactionRadius - dist) / config.interactionRadius;
+                    const angle = Math.atan2(dy, dx);
+                    const push = force * 4;
+                    this.vx += Math.cos(angle) * push;
+                    this.vy += Math.sin(angle) * push;
+                }
+
+                this.vx *= config.friction;
+                this.vy *= config.friction;
+
+                if (!config.usePattern) {
+                    if (this.x < -50) this.x = width + 50;
+                    if (this.x > width + 50) this.x = -50;
+                    if (config.gravity < 0) {
+                        if (this.y < -60) this.init(false); 
+                    } else {
+                        if (this.y > height + 60) this.init(false);
+                    }
+                }
+            }
+
+            draw() {
+                // Use save/restore for better GPU compositing
+                ctx.save();
+                ctx.translate(this.x, this.y);
+                ctx.rotate(this.rotation);
+                
+                // Draw cached sprite instead of vector paths
+                // Calculate final render size including the sprite's internal padding
+                // The sprite is 64x64, but the visual shape is approx 30x30 inside it.
+                // We scale the whole sprite so the visual shape matches 'this.visualSize'.
+                
+                const scaleFactor = (this.visualSize * this.depth) / 30; // 30 is the drawSize in sprite
+                const renderSize = 64 * scaleFactor;
+
+                // drawImage is highly optimized by browsers and uses GPU textures
+                ctx.drawImage(this.sprite, -renderSize/2, -renderSize/2, renderSize, renderSize);
+                
+                ctx.restore();
+            }
+        }
+
+        // --- Animation Loop ---
+        const particles = [];
+        for(let i = 0; i < config.particleCount; i++) {
+            particles.push(new Particle(i));
+        }
+
+        let mouseX = -1000;
+        let mouseY = -1000;
+
+        window.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+        });
+        window.addEventListener('touchmove', (e) => {
+            mouseX = e.touches[0].clientX;
+            mouseY = e.touches[0].clientY;
+        });
+
+        // Animation loop optimized for GPU
+        let lastTime = 0;
+        function animate(currentTime) {
+            // Use requestAnimationFrame's timestamp for frame-rate independent updates
+            const deltaTime = currentTime - lastTime;
+            lastTime = currentTime;
+            
+            // Clear canvas - use GPU-optimized clear
+            ctx.clearRect(0, 0, width, height);
+            
+            // Update and draw all particles
+            // Browsers optimize drawImage calls to GPU textures automatically
+            for (let i = 0; i < particles.length; i++) {
+                particles[i].update(mouseX, mouseY);
+                particles[i].draw();
+            }
+
+            requestAnimationFrame(animate);
+        }
+
+        // Start animation loop
+        requestAnimationFrame(animate);
+
+        // --- Helpers ---
+        function copyUrl(type) {
+            let url = window.location.origin + window.location.pathname;
+            if(type === 1) url += "?speed=2&count=80";
+            if(type === 2) url += "?bg=1a1a1a&fill=e91e63,00bcd4,9c27b0&shape=triangle";
+            if(type === 3) url += "?shape=circle&gravity=0.2&bg=fdf6e3&fill=b58900,cb4b16,dc322f";
+            if(type === 4) url += "?pattern=true&shape=triangle&count=60";
+            window.location.href = url;
+        }
+
+    </script>
+</body>
+</html>

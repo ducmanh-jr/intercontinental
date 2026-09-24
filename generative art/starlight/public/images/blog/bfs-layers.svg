@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 300" role="img" aria-label="BFS 分层染色示意">
+  <defs>
+    <linearGradient id="blBg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#282c34"/>
+      <stop offset="1" stop-color="#21252b"/>
+    </linearGradient>
+  </defs>
+  <rect width="640" height="300" rx="10" fill="url(#blBg)"/>
+  <text x="24" y="34" font-family="monospace" font-size="15" fill="#abb2bf">BFS 染色：col[v] = col[u] ^ (w mod 2)</text>
+
+  <!-- 层带 -->
+  <rect x="130" y="58"  width="380" height="46" rx="10" fill="#61afef" fill-opacity="0.10"/>
+  <rect x="130" y="128" width="380" height="46" rx="10" fill="#98c379" fill-opacity="0.08"/>
+  <rect x="130" y="198" width="380" height="46" rx="10" fill="#c678dd" fill-opacity="0.08"/>
+  <g font-family="monospace" font-size="12" fill="#5c6370">
+    <text x="520" y="85">距离 0</text>
+    <text x="520" y="155">距离 1</text>
+    <text x="520" y="225">距离 2</text>
+  </g>
+
+  <!-- 边：实线 = w 偶，虚线 = w 奇 -->
+  <g stroke-width="2">
+    <line x1="325" y1="82"  x2="235" y2="153" stroke="#98c379"/>
+    <line x1="325" y1="82"  x2="415" y2="153" stroke="#e06c75" stroke-dasharray="6 4"/>
+    <line x1="235" y1="153" x2="180" y2="225" stroke="#98c379"/>
+    <line x1="235" y1="153" x2="290" y2="225" stroke="#e06c75" stroke-dasharray="6 4"/>
+    <line x1="415" y1="153" x2="365" y2="225" stroke="#e06c75" stroke-dasharray="6 4"/>
+    <line x1="415" y1="153" x2="470" y2="225" stroke="#98c379"/>
+  </g>
+
+  <!-- 顶点：白 = 偶距离 0，黑 = 奇距离 1 -->
+  <g font-family="monospace" font-size="14" text-anchor="middle">
+    <circle cx="325" cy="82"  r="17" fill="#abb2bf"/><text x="325" y="87"  fill="#282c34">1</text>
+    <circle cx="235" cy="153" r="17" fill="#abb2bf"/><text x="235" y="158" fill="#282c34">2</text>
+    <circle cx="415" cy="153" r="17" fill="#21252b" stroke="#e06c75" stroke-width="1.5"/><text x="415" y="158" fill="#abb2bf">3</text>
+    <circle cx="180" cy="225" r="17" fill="#abb2bf"/><text x="180" y="230" fill="#282c34">4</text>
+    <circle cx="290" cy="225" r="17" fill="#21252b" stroke="#e06c75" stroke-width="1.5"/><text x="290" y="230" fill="#abb2bf">5</text>
+    <circle cx="365" cy="225" r="17" fill="#abb2bf"/><text x="365" y="230" fill="#282c34">6</text>
+    <circle cx="470" cy="225" r="17" fill="#21252b" stroke="#e06c75" stroke-width="1.5"/><text x="470" y="230" fill="#abb2bf">7</text>
+  </g>
+
+  <!-- 图例 -->
+  <g font-family="monospace" font-size="12" fill="#5c6370">
+    <line x1="24" y1="274" x2="46" y2="274" stroke="#98c379" stroke-width="2"/>
+    <text x="52" y="278">w 偶</text>
+    <line x1="110" y1="274" x2="132" y2="274" stroke="#e06c75" stroke-width="2" stroke-dasharray="5 3"/>
+    <text x="138" y="278">w 奇</text>
+    <rect x="200" y="266" width="12" height="12" fill="#abb2bf"/>
+    <text x="218" y="278">偶距离 → 白</text>
+    <rect x="320" y="266" width="12" height="12" fill="#21252b" stroke="#e06c75" stroke-width="1.5"/>
+    <text x="338" y="278">奇距离 → 黑</text>
+  </g>
+</svg>

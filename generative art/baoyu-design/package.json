@@ -1,0 +1,8 @@
+{
+  "name": "baoyu-design",
+  "version": "1.3.0",
+  "private": true,
+  "scripts": {
+    "test": "node --test 'skills/baoyu-design/agents/tests/*.test.mjs'"
+  }
+}

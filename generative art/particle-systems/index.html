@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>univerti</title>
+    <style>
+        @import url("https://fonts.googleapis.com/css2?family=Megrim&display=swap");
+        body {
+            overflow: hidden;
+            margin: 0;
+        }
+
+        #word {
+            font-family: Megrim, cursive;
+            font-size: 20vh;
+            position: absolute;
+            margin: 10;
+            color: #fc0;
+            -webkit-text-stroke: 0.15vh #c0f;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- <div id="word"></div> -->
+    
+    <script type="module">
+        import * as THREE from "https://cdn.skypack.dev/three@0.136.0";
+        import { OrbitControls } from "https://cdn.skypack.dev/three@0.136.0/examples/jsm/controls/OrbitControls";
+
+        console.clear();
+
+        // Tạo cảnh 3D
+        let scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x160016);  // Màu nền của cảnh
+
+        // Tạo camera và đặt vị trí xa hơn
+        let camera = new THREE.PerspectiveCamera(60, innerWidth / innerHeight, 1, 1000);
+        camera.position.set(0, 4, 40);  // Vị trí camera xa hơn (trục Z lớn hơn)
+
+        // Tạo renderer (trình vẽ)
+        let renderer = new THREE.WebGLRenderer();
+        renderer.setSize(innerWidth, innerHeight);  // Kích thước của canvas
+        document.body.appendChild(renderer.domElement);  // Thêm canvas vào body của trang
+
+        // Xử lý thay đổi kích thước cửa sổ
+        window.addEventListener("resize", () => {
+            camera.aspect = innerWidth / innerHeight;
+            camera.updateProjectionMatrix();  // Cập nhật tỉ lệ khung hình
+            renderer.setSize(innerWidth, innerHeight);  // Cập nhật kích thước của renderer
+        });
+
+        // Thiết lập OrbitControls (Điều khiển camera bằng chuột)
+        let controls = new OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;  // Cho phép hiệu ứng giảm dần
+        controls.enablePan = false;  // Tắt chế độ kéo camera
+
+        // Khởi tạo các giá trị cho đối tượng hạt (particles)
+        let gu = { time: { value: 0 } };
+        let sizes = [];
+        let shift = [];
+
+        // Hàm để thêm giá trị ngẫu nhiên vào mảng shift (chuyển động của các hạt)
+        let pushShift = () => {
+            shift.push(Math.random() * Math.PI, Math.random() * Math.PI * 2, (Math.random() * 0.9 + 0.1) * Math.PI * 0.1, Math.random() * 0.9 + 0.1);
+        };
+
+        // Tạo một mảng các hạt với các tọa độ ngẫu nhiên
+        let pts = new Array(50000).fill().map(() => {
+            sizes.push(Math.random() * 1.5 + 0.5);  // Tạo kích thước ngẫu nhiên cho mỗi hạt
+            pushShift();  // Thêm giá trị chuyển động cho mỗi hạt
+            return new THREE.Vector3().randomDirection().multiplyScalar(Math.random() * 0.5 + 9.5);  // Vị trí ngẫu nhiên cho mỗi hạt
+        });
+
+        // Tạo thêm các hạt với các tọa độ hình trụ
+        for (let i = 0; i < 100000; i++) {
+            let r = 1.0;
+            let R = 40.0;
+            let rand = Math.pow(Math.random(), 1.5);
+            let radius = Math.sqrt(R * R * rand + (1 - rand) * r * r);
+            pts.push(new THREE.Vector3().setFromCylindricalCoords(radius, Math.random() * 2 * Math.PI, (Math.random() - 0.5) * 2));
+            sizes.push(Math.random() * 1.5 + 0.5);
+            pushShift();
+        }
+
+        // Tạo Geometry từ các điểm đã tạo
+        let g = new THREE.BufferGeometry().setFromPoints(pts);
+        g.setAttribute("sizes", new THREE.Float32BufferAttribute(sizes, 1));  // Thiết lập kích thước cho các điểm
+        g.setAttribute("shift", new THREE.Float32BufferAttribute(shift, 4));  // Thiết lập chuyển động cho các điểm
+
+        // Tạo vật liệu với shader tùy chỉnh cho các hạt
+        let m = new THREE.PointsMaterial({
+            size: 0.125,
+            transparent: true,  // Cho phép các hạt trong suốt
+            depthTest: false,  // Tắt kiểm tra chiều sâu
+            blending: THREE.AdditiveBlending,  // Sử dụng phương pháp blending để các hạt sáng lên
+            onBeforeCompile: (shader) => {
+                shader.uniforms.time = gu.time;  // Thêm biến thời gian vào shader
+                shader.vertexShader = `
+                    uniform float time;
+                    attribute float sizes;
+                    attribute vec4 shift;
+                    varying vec3 vColor;
+                    ${shader.vertexShader}
+                `.replace(`gl_PointSize = size;`, `gl_PointSize = size * sizes;`)  // Điều chỉnh kích thước điểm
+                  .replace(`#include <color_vertex>`, `
+                      #include <color_vertex>
+                      float d = length(abs(position) / vec3(40., 10., 40));
+                      d = clamp(d, 0., 1.);
+                      vColor = mix(vec3(227., 155., 0.), vec3(100., 50., 255.), d) / 255.;
+                  `)  // Màu sắc điểm thay đổi theo vị trí
+                  .replace(`#include <begin_vertex>`, `
+                      #include <begin_vertex>
+                      float t = time;
+                      float moveT = mod(shift.x + shift.z * t, PI2);
+                      float moveS = mod(shift.y + shift.z * t, PI2);
+                      transformed += vec3(cos(moveS) * sin(moveT), cos(moveT), sin(moveS) * sin(moveT)) * shift.a;
+                  `);
+
+                shader.fragmentShader = `
+                    varying vec3 vColor;
+                    ${shader.fragmentShader}
+                `.replace(`#include <clipping_planes_fragment>`, `
+                    #include <clipping_planes_fragment>
+                    float d = length(gl_PointCoord.xy - 0.5);
+                `)
+                .replace(`vec4 diffuseColor = vec4( diffuse, opacity );`, `
+                    vec4 diffuseColor = vec4( vColor, smoothstep(0.5, 0.1, d));
+                `);
+            }
+        });
+
+        // Tạo đối tượng Points (các điểm 3D)
+        let p = new THREE.Points(g, m);
+        p.rotation.order = "ZYX";
+        p.rotation.z = 0.2;
+        scene.add(p);
+
+        // Vòng lặp animation
+        let clock = new THREE.Clock();
+        renderer.setAnimationLoop(() => {
+            controls.update();  // Cập nhật điều khiển camera
+            let t = clock.getElapsedTime() * 0.5;
+            gu.time.value = t * Math.PI;  // Cập nhật thời gian cho shader
+            p.rotation.y = t * 0.05;  // Xoay đối tượng theo thời gian
+            renderer.render(scene, camera);  // Vẽ cảnh
+        });
+    </script>
+</body>
+
+</html>

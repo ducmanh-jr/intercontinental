@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 320" role="img" aria-label="min(i,j) 同心环矩阵与轮流放构造示意">
+  <defs>
+    <linearGradient id="crBg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#282c34"/>
+      <stop offset="1" stop-color="#21252b"/>
+    </linearGradient>
+  </defs>
+  <rect width="640" height="320" rx="10" fill="url(#crBg)"/>
+  <text x="24" y="34" font-family="monospace" font-size="15" fill="#abb2bf">答案长在坐标里：a[i][j] = min(i,j) 的奇偶</text>
+
+  <!-- 左：6x6 矩阵（0=青 1=紫 交替环） -->
+  <g font-family="monospace" font-size="13" text-anchor="middle">
+    <!-- 行 1..6 / 列 1..6，cell 28px，起点 (70,70) -->
+    <!-- 手工画三圈轮廓即可：用 rect 网格 -->
+    <!-- 6x6 cells -->
+    <g>
+      <!-- 外环（min=0 → 值0） -->
+      <g fill="#61afef" opacity="0.85">
+        <rect x="70" y="70" width="28" height="28"/><rect x="98" y="70" width="28" height="28"/><rect x="126" y="70" width="28" height="28"/><rect x="154" y="70" width="28" height="28"/><rect x="182" y="70" width="28" height="28"/><rect x="210" y="70" width="28" height="28"/>
+        <rect x="70" y="98" width="28" height="28"/><rect x="210" y="98" width="28" height="28"/>
+        <rect x="70" y="126" width="28" height="28"/><rect x="210" y="126" width="28" height="28"/>
+        <rect x="70" y="154" width="28" height="28"/><rect x="210" y="154" width="28" height="28"/>
+        <rect x="70" y="182" width="28" height="28"/><rect x="210" y="182" width="28" height="28"/>
+        <rect x="70" y="210" width="28" height="28"/><rect x="98" y="210" width="28" height="28"/><rect x="126" y="210" width="28" height="28"/><rect x="154" y="210" width="28" height="28"/><rect x="182" y="210" width="28" height="28"/><rect x="210" y="210" width="28" height="28"/>
+      </g>
+      <!-- 第二环（min=1 → 值1） -->
+      <g fill="#c678dd" opacity="0.85">
+        <rect x="98" y="98" width="28" height="28"/><rect x="126" y="98" width="28" height="28"/><rect x="154" y="98" width="28" height="28"/><rect x="182" y="98" width="28" height="28"/>
+        <rect x="98" y="182" width="28" height="28"/><rect x="126" y="182" width="28" height="28"/><rect x="154" y="182" width="28" height="28"/><rect x="182" y="182" width="28" height="28"/>
+        <rect x="98" y="126" width="28" height="28"/><rect x="98" y="154" width="28" height="28"/>
+        <rect x="182" y="126" width="28" height="28"/><rect x="182" y="154" width="28" height="28"/>
+      </g>
+      <!-- 第三环（min=2 → 值0） -->
+      <g fill="#61afef" opacity="0.85">
+        <rect x="126" y="126" width="28" height="28"/><rect x="154" y="126" width="28" height="28"/>
+        <rect x="126" y="154" width="28" height="28"/><rect x="154" y="154" width="28" height="28"/>
+      </g>
+    </g>
+    <!-- 网格线 -->
+    <g stroke="#21252b" stroke-width="1.5" fill="none">
+      <path d="M70 70 h168 M70 98 h168 M70 126 h168 M70 154 h168 M70 182 h168 M70 210 h168"/>
+      <path d="M70 70 v168 M98 70 v168 M126 70 v168 M154 70 v168 M182 70 v168 M210 70 v168"/>
+      <rect x="70" y="70" width="168" height="168" fill="none"/>
+    </g>
+    <!-- 等值线标注 -->
+    <text x="290" y="90" fill="#61afef" text-anchor="start" font-size="12">min=0 环 → 填 0</text>
+    <text x="290" y="118" fill="#c678dd" text-anchor="start" font-size="12">min=1 环 → 填 1</text>
+    <text x="290" y="146" fill="#61afef" text-anchor="start" font-size="12">min=2 环 → 填 0</text>
+    <text x="290" y="180" fill="#5c6370" font-size="12">「到左上角的街道距离」</text>
+    <text x="290" y="200" fill="#5c6370" font-size="12">按层分奇偶，一圈一色</text>
+  </g>
+
+  <!-- 底部：轮流放 -->
+  <g font-family="monospace" font-size="13">
+    <text x="70" y="278" fill="#abb2bf">比赛安排（A 题）的"轮流放"：A B C A B C…</text>
+    <g font-size="14" text-anchor="middle">
+      <rect x="70" y="288" width="26" height="20" rx="4" fill="#61afef"/><text x="83" y="303" fill="#282c34">A</text>
+      <rect x="100" y="288" width="26" height="20" rx="4" fill="#e5c07b"/><text x="113" y="303" fill="#282c34">B</text>
+      <rect x="130" y="288" width="26" height="20" rx="4" fill="#c678dd"/><text x="143" y="303" fill="#282c34">C</text>
+      <rect x="160" y="288" width="26" height="20" rx="4" fill="#61afef"/><text x="173" y="303" fill="#282c34">A</text>
+      <rect x="190" y="288" width="26" height="20" rx="4" fill="#e5c07b"/><text x="203" y="303" fill="#282c34">B</text>
+      <rect x="220" y="288" width="26" height="20" rx="4" fill="#c678dd"/><text x="233" y="303" fill="#282c34">C</text>
+      <rect x="250" y="288" width="26" height="20" rx="4" fill="#61afef"/><text x="263" y="303" fill="#282c34">A</text>
+    </g>
+    <text x="300" y="303" fill="#98c379">谁没了就跳过 → 均衡即判定</text>
+  </g>
+</svg>

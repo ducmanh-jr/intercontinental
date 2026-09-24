@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 300" role="img" aria-label="相向双指针示意图">
+  <defs>
+    <linearGradient id="tpBg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#282c34"/>
+      <stop offset="1" stop-color="#21252b"/>
+    </linearGradient>
+  </defs>
+  <rect width="640" height="300" rx="10" fill="url(#tpBg)"/>
+  <text x="24" y="36" font-family="monospace" font-size="15" fill="#abb2bf">排序后的 c[]（找 c[i]+c[j] &gt; 0 的对数）</text>
+  <!-- 排序数组 -->
+  <g font-family="monospace" font-size="13" text-anchor="middle">
+    <rect x="60"  y="120" width="70" height="46" rx="5" fill="#e06c75"/><text x="95"  y="149" fill="#282c34">−3</text>
+    <rect x="140" y="132" width="70" height="34" rx="5" fill="#e06c75"/><text x="175" y="156" fill="#282c34">−1</text>
+    <rect x="220" y="140" width="70" height="26" rx="5" fill="#abb2bf" opacity="0.6"/><text x="255" y="158" fill="#282c34">0</text>
+    <rect x="300" y="112" width="70" height="54" rx="5" fill="#98c379"/><text x="335" y="146" fill="#282c34">2</text>
+    <rect x="380" y="100" width="70" height="66" rx="5" fill="#98c379"/><text x="415" y="140" fill="#282c34">4</text>
+    <rect x="460" y="90"  width="70" height="76" rx="5" fill="#98c379"/><text x="495" y="134" fill="#282c34">7</text>
+  </g>
+  <!-- 指针 -->
+  <g stroke-width="2.5" fill="none">
+    <path d="M95 180 v22 M87 196 l8 10 8 -10" stroke="#61afef"/>
+    <path d="M495 180 v22 M487 196 l8 10 8 -10" stroke="#c678dd"/>
+  </g>
+  <text x="80" y="232" font-family="monospace" font-size="14" fill="#61afef">l</text>
+  <text x="488" y="232" font-family="monospace" font-size="14" fill="#c678dd">r</text>
+  <!-- 判定 -->
+  <g font-family="monospace" font-size="14">
+    <text x="240" y="228" fill="#abb2bf">c[l] + c[r] = −3 + 7 &gt; 0</text>
+    <text x="240" y="252" fill="#98c379">→ (l, r] 全部可配对：ans += r − l</text>
+    <text x="240" y="276" fill="#e5c07b">→ r 左移继续找更小的可能</text>
+  </g>
+  <text x="24" y="290" font-family="monospace" font-size="11" fill="#5c6370">两端各走一遍，O(n) 完成计数，无需二重循环</text>
+</svg>
